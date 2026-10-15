@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo{% endblock %}
+
+{% block content %}
+<h1>Catálogo</h1>
+<div class="grilla">
+    {% for p in productos %}
+    <article class="tarjeta">
+        {% if p.imagen %}
+        <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+        {% endif %}
+        <h2>{{ p.nombre }}</h2>
+        <p>{{ p.marca }} · {{ p.categoria }}</p>
+        <p class="precio">${{ p.precio }}</p>
+        <p>{% if p.stock > 0 %}Disponible{% else %}Sin stock{% endif %}</p>
+    </article>
+    {% empty %}
+    <p>Todavía no hay productos.</p>
+    {% endfor %}
+</div>
+{% endblock %}
