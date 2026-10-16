@@ -169,3 +169,61 @@ header nav button {
     color: #b00020;
     padding-left: 1rem;
 }
+
+.mensajes {
+    list-style: none;
+    padding: 0;
+}
+
+.mensajes li {
+    border: 1px solid #111;
+    padding: .5rem 1rem;
+    margin-bottom: .5rem;
+}
+
+.mensajes .error {
+    border-color: #b00020;
+    color: #b00020;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+    border-bottom: 1px solid #ddd;
+    padding: .5rem;
+    text-align: left;
+}
+
+.en-linea {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin: 0;
+}
+
+.en-linea input {
+    width: 5rem;
+    padding: .4rem;
+    border: 1px solid #111;
+}
+
+.en-linea button,
+.tabla button {
+    padding: .4rem .8rem;
+    border: 1px solid #111;
+    background: #fff;
+    cursor: pointer;
+}
+
+.total {
+    font-weight: 700;
+    font-size: 1.2rem;
+}

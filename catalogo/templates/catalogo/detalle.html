@@ -14,6 +14,13 @@
         <p>{{ producto.marca }} · {{ producto.categoria }}</p>
         <p class="precio">${{ producto.precio }}</p>
         <p>{% if producto.stock > 0 %}Disponible ({{ producto.stock }} unidades){% else %}Sin stock{% endif %}</p>
+        {% if producto.stock > 0 %}
+        <form method="post" action="{% url 'pedidos:agregar' producto.pk %}" class="en-linea">
+            {% csrf_token %}
+            <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}">
+            <button type="submit">Agregar al carrito</button>
+        </form>
+        {% endif %}
         <p>{{ producto.descripcion|linebreaksbr }}</p>
     </div>
 </article>

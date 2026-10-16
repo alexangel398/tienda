@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Carrito{% endblock %}
+
+{% block content %}
+<h1>Carrito</h1>
+
+{% if items %}
+<div class="tabla-scroll">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in items %}
+            <tr>
+                <td><a href="{% url 'catalogo:detalle' i.producto.pk %}">{{ i.producto.nombre }}</a></td>
+                <td>${{ i.producto.precio }}</td>
+                <td>
+                    <form method="post" action="{% url 'pedidos:actualizar' i.producto.pk %}" class="en-linea">
+                        {% csrf_token %}
+                        <input type="number" name="cantidad" value="{{ i.cantidad }}" min="0"
+                            max="{{ i.producto.stock }}">
+                        <button type="submit">Cambiar</button>
+                    </form>
+                </td>
+                <td>${{ i.subtotal }}</td>
+                <td>
+                    <form method="post" action="{% url 'pedidos:quitar' i.producto.pk %}">
+                        {% csrf_token %}
+                        <button type="submit">Quitar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="total">Total: ${{ total }}</p>
+{% else %}
+<p>El carrito está vacío.</p>
+{% endif %}
+
+<p><a href="{% url 'catalogo:listado' %}">← Seguir comprando</a></p>
+{% endblock %}
