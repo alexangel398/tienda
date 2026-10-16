@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.shortcuts import redirect, render
 
 from .forms import RegistroForm
+from .services import asignar_rol_cliente
 
 
 def registro(request):
@@ -9,6 +10,7 @@ def registro(request):
         form = RegistroForm(request.POST)
         if form.is_valid():
             usuario = form.save()
+            asignar_rol_cliente(usuario)
             login(request, usuario)
             return redirect("catalogo:listado")
     else:
