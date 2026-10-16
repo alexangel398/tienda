@@ -12,6 +12,18 @@
 <body>
     <header>
         <a href="{% url 'catalogo:listado' %}">Tienda</a>
+        <nav>
+            {% if user.is_authenticated %}
+            <span>Hola, {{ user.username }}</span>
+            <form method="post" action="{% url 'cuentas:logout' %}">
+                {% csrf_token %}
+                <button type="submit">Salir</button>
+            </form>
+            {% else %}
+            <a href="{% url 'cuentas:login' %}">Ingresar</a>
+            <a href="{% url 'cuentas:registro' %}">Registrarse</a>
+            {% endif %}
+        </nav>
     </header>
     <main>
         {% block content %}{% endblock %}

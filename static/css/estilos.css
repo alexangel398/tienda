@@ -110,3 +110,62 @@ main {
     border: 1px solid #111;
     flex: 1 1 200px;
 }
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+header nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+header nav a {
+    color: #111;
+}
+
+header nav form {
+    margin: 0;
+}
+
+header nav button {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.formulario {
+    max-width: 420px;
+}
+
+.formulario input {
+    width: 100%;
+    padding: .5rem;
+    border: 1px solid #111;
+}
+
+.formulario button {
+    padding: .5rem 1rem;
+    border: 0;
+    background: #111;
+    color: #fff;
+    cursor: pointer;
+}
+
+.helptext,
+.errorlist {
+    font-size: .85rem;
+}
+
+.errorlist {
+    color: #b00020;
+    padding-left: 1rem;
+}
