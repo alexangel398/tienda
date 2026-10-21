@@ -1,6 +1,7 @@
 from decimal import Decimal
-
+from django.db import transaction
 from catalogo.models import Producto
+from .models import DetallePedido, Pedido
 
 CLAVE_SESION = "carrito"
 
@@ -61,3 +62,54 @@ class Carrito:
     @property
     def total(self):
         return sum((item["subtotal"] for item in self), Decimal("0"))
+    
+    
+class StockInsuficiente(Exception):
+    def __init__(self, productos):
+        self.productos = productos
+        super().__init__("Stock insuficiente")
+
+
+def crear_pedido(carrito, cliente, datos):
+    items = list(carrito)
+    if not items:
+        raise ValueError("El carrito está vacío.")
+
+    with transaction.atomic():
+        ids = [item["producto"].pk for item in items]
+        productos = {
+            p.pk: p
+            for p in Producto.objects.select_for_update().filter(pk__in=ids).order_by("pk")
+        }
+
+        faltantes = [
+            productos[item["producto"].pk].nombre
+            for item in items
+            if item["cantidad"] > productos[item["producto"].pk].stock
+        ]
+        if faltantes:
+            raise StockInsuficiente(faltantes)
+
+        pedido = Pedido.objects.create(
+            cliente=cliente,
+            entrega=datos["entrega"],
+            telefono=datos["telefono"],
+            direccion=datos.get("direccion", ""),
+        )
+        total = Decimal("0")
+        for item in items:
+            producto = productos[item["producto"].pk]
+            DetallePedido.objects.create(
+                pedido=pedido,
+                producto=producto,
+                cantidad=item["cantidad"],
+                precio_unitario=producto.precio,
+            )
+            producto.stock -= item["cantidad"]
+            producto.save(update_fields=["stock"])
+            total += producto.precio * item["cantidad"]
+        pedido.total = total
+        pedido.save(update_fields=["total"])
+
+    carrito.vaciar()
+    return pedido

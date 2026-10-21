@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Pedido registrado{% endblock %}
+
+{% block content %}
+<h1>Pedido #{{ pedido.pk }} registrado</h1>
+<p>Estado: {{ pedido.get_estado_display }} · Entrega: {{ pedido.get_entrega_display }}</p>
+
+<table class="tabla">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in pedido.detalles.all %}
+        <tr>
+            <td>{{ d.producto.nombre }}</td>
+            <td>{{ d.cantidad }}</td>
+            <td>${{ d.subtotal }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p class="total">Total: ${{ pedido.total }}</p>
+
+<p>El pago y la entrega se coordinan directamente con el negocio. Podés escribirnos por WhatsApp.</p>
+<p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
+{% endblock %}

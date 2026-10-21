@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar pedido{% endblock %}
+
+{% block content %}
+<h1>Confirmar pedido</h1>
+
+<ul>
+    {% for i in items %}
+    <li>{{ i.cantidad }} x {{ i.producto.nombre }} — ${{ i.subtotal }}</li>
+    {% endfor %}
+</ul>
+<p class="total">Total: ${{ total }}</p>
+
+<form method="post" class="formulario">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Confirmar pedido</button>
+</form>
+<p><a href="{% url 'pedidos:carrito' %}">← Volver al carrito</a></p>
+{% endblock %}

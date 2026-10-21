@@ -43,6 +43,7 @@
     </table>
 </div>
 <p class="total">Total: ${{ total }}</p>
+<p><a class="boton" href="{% url 'pedidos:confirmar' %}">Confirmar pedido</a></p>
 {% else %}
 <p>El carrito está vacío.</p>
 {% endif %}
