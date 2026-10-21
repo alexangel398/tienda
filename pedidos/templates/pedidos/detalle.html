@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Pedido #{{ pedido.pk }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'pedidos:mis_pedidos' %}">← Mis pedidos</a></p>
+
+<h1>Pedido #{{ pedido.pk }}</h1>
+<p>
+    {{ pedido.fecha|date:"d/m/Y H:i" }} · Estado: <strong>{{ pedido.get_estado_display }}</strong>
+    · Entrega: {{ pedido.get_entrega_display }}
+</p>
+{% if pedido.direccion %}<p>Dirección: {{ pedido.direccion }}</p>{% endif %}
+
+<div class="tabla-scroll">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in pedido.detalles.all %}
+            <tr>
+                <td>{{ d.producto.nombre }}</td>
+                <td>{{ d.cantidad }}</td>
+                <td>${{ d.precio_unitario }}</td>
+                <td>${{ d.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="total">Total: ${{ pedido.total }}</p>
+{% endblock %}

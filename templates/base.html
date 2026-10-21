@@ -15,6 +15,7 @@
         <nav>
             <a href="{% url 'pedidos:carrito' %}">Carrito ({{ carrito_cantidad }})</a>
             {% if user.is_authenticated %}
+            <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>
             <span>Hola, {{ user.username }}</span>
             <form method="post" action="{% url 'cuentas:logout' %}">
                 {% csrf_token %}

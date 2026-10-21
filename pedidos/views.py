@@ -78,3 +78,18 @@ def confirmar(request):
 def exito(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk, cliente=request.user)
     return render(request, "pedidos/exito.html", {"pedido": pedido})
+
+@login_required
+def mis_pedidos(request):
+    pedidos = Pedido.objects.filter(cliente=request.user)
+    return render(request, "pedidos/mis_pedidos.html", {"pedidos": pedidos})
+
+
+@login_required
+def detalle(request, pk):
+    pedido = get_object_or_404(
+        Pedido.objects.prefetch_related("detalles__producto"),
+        pk=pk,
+        cliente=request.user,
+    )
+    return render(request, "pedidos/detalle.html", {"pedido": pedido})

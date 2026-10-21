@@ -27,5 +27,6 @@
 <p class="total">Total: ${{ pedido.total }}</p>
 
 <p>El pago y la entrega se coordinan directamente con el negocio. Podés escribirnos por WhatsApp.</p>
+<p><a href="{% url 'pedidos:mis_pedidos' %}">Ver mis pedidos</a></p>
 <p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
 {% endblock %}

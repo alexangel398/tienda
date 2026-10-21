@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Mis pedidos{% endblock %}
+
+{% block content %}
+<h1>Mis pedidos</h1>
+
+{% if pedidos %}
+<div class="tabla-scroll">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Pedido</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pedidos %}
+            <tr>
+                <td><a href="{% url 'pedidos:detalle' p.pk %}">Pedido #{{ p.pk }}</a></td>
+                <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ p.get_estado_display }}</td>
+                <td>${{ p.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p>Todavía no hiciste ningún pedido.</p>
+{% endif %}
+
+<p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
+{% endblock %}
