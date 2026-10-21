@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.db import transaction
 from catalogo.models import Producto
 from .models import DetallePedido, Pedido
+from django.db.models import F
 
 CLAVE_SESION = "carrito"
 
@@ -112,4 +113,35 @@ def crear_pedido(carrito, cliente, datos):
         pedido.save(update_fields=["total"])
 
     carrito.vaciar()
+    return pedido
+
+TRANSICIONES = {
+    Pedido.Estado.PENDIENTE: {Pedido.Estado.PREPARADO, Pedido.Estado.CANCELADO},
+    Pedido.Estado.PREPARADO: {Pedido.Estado.ENTREGADO, Pedido.Estado.CANCELADO},
+    Pedido.Estado.ENTREGADO: set(),
+    Pedido.Estado.CANCELADO: set(),
+}
+
+
+class TransicionInvalida(Exception):
+    pass
+
+
+def cambiar_estado(pedido, nuevo_estado):
+    with transaction.atomic():
+        pedido = Pedido.objects.select_for_update().get(pk=pedido.pk)
+        if nuevo_estado == pedido.estado:
+            return pedido
+        if nuevo_estado not in TRANSICIONES[pedido.estado]:
+            raise TransicionInvalida(
+                f"No se puede pasar de {Pedido.Estado(pedido.estado).label} "
+                f"a {Pedido.Estado(nuevo_estado).label}."
+            )
+        if nuevo_estado == Pedido.Estado.CANCELADO:
+            for detalle in pedido.detalles.all():
+                Producto.objects.filter(pk=detalle.producto_id).update(
+                    stock=F("stock") + detalle.cantidad
+                )
+        pedido.estado = nuevo_estado
+        pedido.save(update_fields=["estado"])
     return pedido
