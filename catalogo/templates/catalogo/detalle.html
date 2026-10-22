@@ -20,7 +20,15 @@
             <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}">
             <button type="submit">Agregar al carrito</button>
         </form>
+        {% else %}
+        <p>Producto agotado</p>
         {% endif %}
+
+        {% with mensaje="Hola, quiero consultar por "|add:producto.nombre %}
+        <p><a class="boton" href="https://wa.me/{{ negocio.whatsapp }}?text={{ mensaje|urlencode }}" target="_blank"
+                rel="noopener">Consultar por este producto</a></p>
+        {% endwith %}
+        
         <p>{{ producto.descripcion|linebreaksbr }}</p>
     </div>
 </article>

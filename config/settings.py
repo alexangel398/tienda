@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'catalogo',
     'cuentas',
     'pedidos',
+    'paginas',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'pedidos.context_processors.carrito',
+                'paginas.context_processors.negocio'
             ],
         },
     },
@@ -130,3 +132,10 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 LOGIN_URL = "cuentas:login"
 LOGIN_REDIRECT_URL = "catalogo:listado"
 LOGOUT_REDIRECT_URL = "catalogo:listado"
+
+NEGOCIO = {
+    "nombre": env("NEGOCIO_NOMBRE", default="Insumos y Máquinas"),
+    "whatsapp": env("NEGOCIO_WHATSAPP", default="5491163633835"),
+    "direccion": env("NEGOCIO_DIRECCION", default="Av. Ejemplo 1234, Buenos Aires"),
+    "horarios": env("NEGOCIO_HORARIOS", default="Lunes a viernes de 9 a 18 h"),
+}

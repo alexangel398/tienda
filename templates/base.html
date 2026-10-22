@@ -8,10 +8,12 @@
     <title>{% block title %}Tienda{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
 </head>
+<a class="whatsapp-flotante" href="{{ whatsapp_url }}" target="_blank" rel="noopener"
+    aria-label="Escribinos por WhatsApp">WhatsApp</a>
 
 <body>
     <header>
-        <a href="{% url 'catalogo:listado' %}">Tienda</a>
+        <a href="{% url 'catalogo:listado' %}">{{ negocio.nombre }}</a>
         <nav>
             <a href="{% url 'pedidos:carrito' %}">Carrito ({{ carrito_cantidad }})</a>
             {% if user.is_authenticated %}
