@@ -263,3 +263,47 @@ body {
 .whatsapp-flotante:hover {
     background: #333;
 }
+
+header .marca {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+header nav {
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+}
+
+header nav a {
+    font-weight: 400;
+}
+
+.portada {
+    padding: 2rem 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1.5rem;
+}
+
+.botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+}
+
+.foto-historia {
+    margin: 0 0 1rem;
+}
+
+.foto-historia img {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.mapa iframe {
+    width: 100%;
+    height: 320px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}

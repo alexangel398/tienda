@@ -24,6 +24,7 @@ urlpatterns = [
     path('catalogo/', include('catalogo.urls')),
     path("cuentas/", include("cuentas.urls")),
     path("", include("pedidos.urls")),
+    path("", include("paginas.urls")),
 ]
 
 if settings.DEBUG:

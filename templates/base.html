@@ -5,7 +5,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Tienda{% endblock %}</title>
+    <title>{% block title %}Inicio{% endblock %} · {{ negocio.nombre }} · {{ negocio.ciudad }}</title>
+    <meta name="description"
+        content="{% block description %}{{ negocio.nombre }} en {{ negocio.ciudad }}: insumos y máquinas.{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
 </head>
 <a class="whatsapp-flotante" href="{{ whatsapp_url }}" target="_blank" rel="noopener"
@@ -13,8 +15,11 @@
 
 <body>
     <header>
-        <a href="{% url 'catalogo:listado' %}">{{ negocio.nombre }}</a>
+        <a class="marca" href="{% url 'paginas:inicio' %}">{{ negocio.nombre }}</a>
         <nav>
+            <a href="{% url 'catalogo:listado' %}">Catálogo</a>
+            <a href="{% url 'paginas:historia' %}">Nuestra historia</a>
+            <a href="{% url 'paginas:contacto' %}">Contacto</a>
             <a href="{% url 'pedidos:carrito' %}">Carrito ({{ carrito_cantidad }})</a>
             {% if user.is_authenticated %}
             <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>

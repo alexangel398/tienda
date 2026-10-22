@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+{% block description %}{{ negocio.nombre }} en {{ negocio.ciudad }}: insumos y máquinas. Mirá el catálogo y hacé tu
+pedido.{% endblock %}
+
+{% block content %}
+<section class="portada">
+    <h1>{{ negocio.nombre }}</h1>
+    <p>Insumos y máquinas en {{ negocio.ciudad }}. Elegí tus productos y coordinamos el pedido.</p>
+    <p class="botones">
+        <a class="boton" href="{% url 'catalogo:listado' %}">Ver catálogo</a>
+        <a class="boton" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
+    </p>
+</section>
+
+<h2>Últimos productos</h2>
+<div class="grilla">
+    {% for p in destacados %}
+    <article class="tarjeta">
+        <a href="{% url 'catalogo:detalle' p.pk %}">
+            {% if p.imagen %}<img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">{% endif %}
+            <h3>{{ p.nombre }}</h3>
+        </a>
+        <p>{{ p.marca }}</p>
+        <p class="precio">${{ p.precio }}</p>
+    </article>
+    {% empty %}
+    <p>Pronto vas a ver acá nuestros productos.</p>
+    {% endfor %}
+</div>
+{% endblock %}

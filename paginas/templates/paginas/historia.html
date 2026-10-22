@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nuestra historia{% endblock %}
+{% block description %}La historia de {{ negocio.nombre }}: cómo empezamos y cómo crecimos paso a paso en {{
+negocio.ciudad }}.{% endblock %}
+
+{% block content %}
+<h1>Nuestra historia</h1>
+
+<figure class="foto-historia">
+    <img src="{% static 'img/local.jpg' %}" alt="El local de {{ negocio.nombre }}">
+</figure>
+
+<p>Empezamos en ferias, con unos pocos productos y mucho trabajo. Con el tiempo, los clientes volvieron, nos
+    recomendaron y el negocio fue creciendo paso a paso.</p>
+<p>Hoy seguimos tratando a cada cliente igual que el primer día: conocemos bien cada producto y te ayudamos a elegir el
+    que necesitás.</p>
+<p>Gracias por visitarnos, en el local y ahora también por acá.</p>
+{% endblock %}

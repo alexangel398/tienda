@@ -138,4 +138,5 @@ NEGOCIO = {
     "whatsapp": env("NEGOCIO_WHATSAPP", default="5491163633835"),
     "direccion": env("NEGOCIO_DIRECCION", default="Av. Ejemplo 1234, Buenos Aires"),
     "horarios": env("NEGOCIO_HORARIOS", default="Lunes a viernes de 9 a 18 h"),
+    "ciudad": env("NEGOCIO_CIUDAD", default="Buenos Aires"),
 }

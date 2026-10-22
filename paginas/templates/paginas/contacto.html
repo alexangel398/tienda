@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Ubicación y contacto{% endblock %}
+{% block description %}Cómo llegar a {{ negocio.nombre }} en {{ negocio.ciudad }}: dirección, horarios y contacto por
+WhatsApp.{% endblock %}
+
+{% block content %}
+<h1>Ubicación y contacto</h1>
+<p><strong>Dirección:</strong> {{ negocio.direccion }}</p>
+<p><strong>Horarios:</strong> {{ negocio.horarios }}</p>
+
+<p class="botones">
+    <a class="boton" href="https://www.google.com/maps/search/?api=1&amp;query={{ negocio.direccion|urlencode }}"
+        target="_blank" rel="noopener">Cómo llegar</a>
+    <a class="boton" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+</p>
+
+<div class="mapa">
+    <iframe title="Mapa del local"
+        src="https://maps.google.com/maps?q={{ negocio.direccion|urlencode }}&amp;output=embed" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+{% endblock %}
