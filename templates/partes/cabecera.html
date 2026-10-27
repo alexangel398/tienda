@@ -1,0 +1,39 @@
+<header class="cabecera">
+    <div class="contenedor cabecera-fila">
+        <a class="marca" href="{% url 'paginas:inicio' %}">{% include "partes/marca.html" %}</a>
+
+        <nav class="menu" id="menu-principal" aria-label="Principal">
+            {% for e in enlaces %}<a href="{% url e.url %}">{{ e.texto }}</a>{% endfor %}
+        </nav>
+
+        <form class="buscador" action="{% url 'catalogo:listado' %}" method="get" role="search">
+            {% include "partes/icono.html" with nombre="buscar" %}
+            <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar productos..."
+                aria-label="Buscar productos">
+        </form>
+
+        <a class="carrito-enlace" href="{% url 'pedidos:carrito' %}" aria-label="Carrito">
+            {% include "partes/icono.html" with nombre="carrito" %}
+            {% if carrito_cantidad %}<span class="contador">{{ carrito_cantidad }}</span>{% endif %}
+        </a>
+
+        <div class="cuenta">
+            {% if user.is_authenticated %}
+            <span class="saludo">Hola, {{ user.username }}</span>
+            <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>
+            <form method="post" action="{% url 'cuentas:logout' %}">
+                {% csrf_token %}
+                <button type="submit">Salir</button>
+            </form>
+            {% else %}
+            <a href="{% url 'cuentas:login' %}">Iniciar sesión</a>
+            <a class="boton boton-chico" href="{% url 'cuentas:registro' %}">Regístrate</a>
+            {% endif %}
+        </div>
+
+        <button class="menu-boton" type="button" data-menu-boton aria-expanded="false" aria-controls="menu-principal"
+            aria-label="Abrir menú">
+            {% include "partes/icono.html" with nombre="menu" %}
+        </button>
+    </div>
+</header>

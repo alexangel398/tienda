@@ -9,11 +9,12 @@ WhatsApp.{% endblock %}
 <p><strong>Dirección:</strong> {{ negocio.direccion }}</p>
 <p><strong>Horarios:</strong> {{ negocio.horarios }}</p>
 
-<p class="botones">
+<div class="acciones">
     <a class="boton" href="https://www.google.com/maps/search/?api=1&amp;query={{ negocio.direccion|urlencode }}"
         target="_blank" rel="noopener">Cómo llegar</a>
-    <a class="boton" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Escribir por WhatsApp</a>
-</p>
+    <a class="boton boton-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{% include
+        "partes/icono.html" with nombre="whatsapp" %}Escribir por WhatsApp</a>
+</div>
 
 <div class="mapa">
     <iframe title="Mapa del local"

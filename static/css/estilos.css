@@ -1,191 +1,239 @@
-* {
+/* ===== 1. Variables ===== */
+:root {
+    --acento: #f59e0b;
+    --acento-oscuro: #d97706;
+    --acento-suave: #fff7e6;
+    --texto: #111827;
+    --texto-suave: #6b7280;
+    --borde: #e5e7eb;
+    --fondo: #ffffff;
+    --fondo-suave: #fafafa;
+    --error: #b91c1c;
+    --radio: 16px;
+    --radio-chico: 10px;
+    --sombra-suave: 0 1px 8px rgba(17, 24, 39, .08);
+    --sombra-tarjeta: 0 2px 14px rgba(17, 24, 39, .08);
+    --ancho: 1100px;
+    --whatsapp: #25d366;
+    --whatsapp-oscuro: #1ebe5a;
+}
+
+/* ===== 2. Base ===== */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: system-ui, sans-serif;
-    color: #111;
-    background: #fff;
+    padding-bottom: 4.5rem;
+    font-family: "Inter", system-ui, sans-serif;
+    line-height: 1.5;
+    color: var(--texto);
+    background: var(--fondo);
 }
 
-header {
-    padding: 1rem;
-    border-bottom: 1px solid #ddd;
+img {
+    max-width: 100%;
+    display: block;
 }
 
-header a {
-    color: #111;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-.grilla {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-}
-
-.tarjeta {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-}
-
-.tarjeta img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-
-.precio {
-    font-weight: 700;
-}
-
-@media (min-width: 600px) {
-    .grilla {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 900px) {
-    .grilla {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-.filtros {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.filtros select,
-.filtros button {
-    padding: .5rem;
-    border: 1px solid #111;
-    background: #fff;
-}
-
-.filtros button {
-    background: #111;
-    color: #fff;
-    cursor: pointer;
-}
-
-.tarjeta a {
+a {
     color: inherit;
-    text-decoration: none;
 }
 
-.detalle {
-    display: grid;
-    gap: 1rem;
+h1,
+h2,
+h3 {
+    line-height: 1.2;
+    margin: 0 0 .75rem;
 }
 
-.detalle img {
+h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.1rem;
+}
+
+p {
+    margin: 0 0 1rem;
+}
+
+:focus-visible {
+    outline: 2px solid var(--acento);
+    outline-offset: 2px;
+}
+
+.contenedor {
     width: 100%;
-    max-height: 420px;
-    object-fit: cover;
-    border-radius: 8px;
+    max-width: var(--ancho);
+    margin-inline: auto;
+    padding-inline: 1rem;
 }
 
-@media (min-width: 700px) {
-    .detalle {
-        grid-template-columns: 1fr 1fr;
-    }
+main.contenedor {
+    padding-block: 1.5rem 3rem;
 }
 
-.filtros input[type="search"] {
-    padding: .5rem;
-    border: 1px solid #111;
-    flex: 1 1 200px;
+.acento {
+    color: var(--acento);
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
+.texto-suave {
+    color: var(--texto-suave);
+}
+
+.icono {
+    width: 1.25em;
+    height: 1.25em;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.icono-lleno {
+    fill: currentColor;
+    stroke: none;
+}
+
+/* ===== 3. Botones ===== */
+.boton {
+    display: inline-flex;
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: center;
     gap: .5rem;
-}
-
-header nav {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-header nav a {
-    color: #111;
-}
-
-header nav form {
-    margin: 0;
-}
-
-header nav button {
-    background: none;
-    border: 0;
-    padding: 0;
+    min-height: 2.75rem;
+    padding: .6rem 1.4rem;
+    border: 1px solid var(--acento);
+    border-radius: 999px;
+    background: var(--acento);
+    color: var(--texto);
     font: inherit;
-    text-decoration: underline;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
     cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+
+.boton:hover {
+    background: var(--acento-oscuro);
+    border-color: var(--acento-oscuro);
+}
+
+.boton-borde {
+    background: var(--fondo);
+    border-color: var(--borde);
+}
+
+.boton-borde:hover {
+    background: var(--fondo-suave);
+    border-color: var(--texto-suave);
+}
+
+.boton-whatsapp {
+    background: var(--whatsapp);
+    border-color: var(--whatsapp);
+    color: #fff;
+}
+
+.boton-whatsapp:hover {
+    background: var(--whatsapp-oscuro);
+    border-color: var(--whatsapp-oscuro);
+}
+
+.boton-chico {
+    min-height: 2.25rem;
+    padding: .35rem 1rem;
+    font-size: .9rem;
+}
+
+.boton-bloque {
+    width: 100%;
+}
+
+.boton:disabled {
+    background: var(--borde);
+    border-color: var(--borde);
+    color: var(--texto-suave);
+    cursor: not-allowed;
+}
+
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+}
+
+.acciones .boton {
+    flex: 1 1 12rem;
+}
+
+/* ===== 4. Formularios ===== */
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+    padding: .6rem .9rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-chico);
+    background: var(--fondo);
 }
 
 .formulario {
-    max-width: 420px;
+    max-width: 460px;
 }
 
-.formulario input {
+.formulario label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: .25rem;
+}
+
+.formulario input:not([type="radio"]),
+.formulario select,
+.formulario textarea {
     width: 100%;
-    padding: .5rem;
-    border: 1px solid #111;
 }
 
-.formulario button {
-    padding: .5rem 1rem;
-    border: 0;
-    background: #111;
-    color: #fff;
-    cursor: pointer;
-}
-
-.helptext,
-.errorlist {
-    font-size: .85rem;
-}
-
-.errorlist {
-    color: #b00020;
-    padding-left: 1rem;
-}
-
-.mensajes {
+.formulario ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
-.mensajes li {
-    border: 1px solid #111;
-    padding: .5rem 1rem;
-    margin-bottom: .5rem;
+.formulario ul label {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-weight: 400;
 }
 
-.mensajes .error {
-    border-color: #b00020;
-    color: #b00020;
+.helptext {
+    display: block;
+    font-size: .85rem;
+    color: var(--texto-suave);
 }
 
+.errorlist {
+    margin: .25rem 0;
+    padding-left: 1rem;
+    font-size: .85rem;
+    color: var(--error);
+}
+
+/* ===== 5. Tablas ===== */
 .tabla-scroll {
     overflow-x: auto;
 }
@@ -197,9 +245,479 @@ header nav button {
 
 .tabla th,
 .tabla td {
-    border-bottom: 1px solid #ddd;
-    padding: .5rem;
+    padding: .75rem .5rem;
+    border-bottom: 1px solid var(--borde);
     text-align: left;
+}
+
+.tabla th {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--texto-suave);
+}
+
+/* ===== 6. Mensajes ===== */
+.mensajes {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: grid;
+    gap: .5rem;
+}
+
+.mensajes li {
+    padding: .75rem 1rem;
+    border: 1px solid var(--acento);
+    border-radius: var(--radio-chico);
+    background: var(--acento-suave);
+}
+
+.mensajes .error {
+    border-color: var(--error);
+    background: #fef2f2;
+    color: var(--error);
+}
+
+/* ===== 7. Cabecera ===== */
+.cabecera {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--fondo);
+    box-shadow: var(--sombra-suave);
+}
+
+.cabecera-fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1rem;
+    padding-block: .9rem;
+}
+
+.marca {
+    font-size: 1.4rem;
+    font-weight: 500;
+    letter-spacing: -.01em;
+    text-decoration: none;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.marca {
+    order: 1;
+    margin-right: auto;
+}
+
+.carrito-enlace {
+    order: 2;
+}
+
+.menu-boton {
+    order: 3;
+}
+
+.buscador {
+    order: 4;
+    flex: 1 1 100%;
+}
+
+.menu,
+.cuenta {
+    order: 5;
+    flex-basis: 100%;
+    display: none;
+    flex-direction: column;
+    gap: .25rem;
+}
+
+.menu-abierto .menu,
+.menu-abierto .cuenta {
+    display: flex;
+}
+
+.menu a,
+.cuenta a {
+    padding: .4rem 0;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.menu a:hover,
+.cuenta a:not(.boton):hover {
+    color: var(--acento-oscuro);
+}
+
+.cuenta {
+    align-items: flex-start;
+}
+
+.cuenta form {
+    margin: 0;
+}
+
+.cuenta button {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.saludo {
+    color: var(--texto-suave);
+}
+
+.menu-boton {
+    display: inline-flex;
+    padding: .4rem;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.carrito-enlace {
+    position: relative;
+    display: inline-flex;
+    padding: .4rem;
+    text-decoration: none;
+}
+
+.contador {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 .25rem;
+    border-radius: 999px;
+    background: var(--acento);
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+.buscador {
+    position: relative;
+}
+
+.buscador .icono {
+    position: absolute;
+    left: .9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--texto-suave);
+    pointer-events: none;
+}
+
+.buscador input {
+    width: 100%;
+    padding-left: 2.6rem;
+    border-radius: 999px;
+}
+
+@media (min-width: 900px) {
+    .menu-boton {
+        display: none;
+    }
+
+    .marca {
+        order: 1;
+        margin-right: 0;
+    }
+
+    .buscador {
+        order: 2;
+        flex: 1 1 auto;
+        max-width: 520px;
+        margin-inline: auto;
+    }
+
+    .carrito-enlace {
+        order: 3;
+    }
+
+    .cuenta {
+        order: 4;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-basis: auto;
+        gap: 1rem;
+    }
+
+    .menu {
+        order: 5;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        flex-basis: 100%;
+        gap: 2rem;
+        padding-top: .5rem;
+        border-top: 1px solid var(--borde);
+    }
+}
+
+/* ===== 8. Pie de página ===== */
+.pie {
+    margin-top: 3rem;
+    border-top: 1px solid var(--borde);
+}
+
+.pie-grilla {
+    display: grid;
+    gap: 2rem;
+    padding-block: 2.5rem;
+}
+
+.pie h3 {
+    margin-bottom: .75rem;
+    font-size: .8rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.pie ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: .5rem;
+}
+
+.pie a {
+    color: var(--texto-suave);
+    text-decoration: none;
+}
+
+.pie a:hover {
+    color: var(--texto);
+}
+
+.pie-datos {
+    margin-top: 1rem;
+}
+
+.pie-datos li {
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+    color: var(--texto-suave);
+}
+
+.pie-datos .icono {
+    margin-top: .15rem;
+    color: var(--acento);
+}
+
+.pie-inferior {
+    padding-block: 1rem;
+    border-top: 1px solid var(--borde);
+    font-size: .9rem;
+    color: var(--texto-suave);
+}
+
+@media (min-width: 700px) {
+    .pie-grilla {
+        grid-template-columns: 2fr 1fr 1fr;
+    }
+}
+
+/* ===== 9. Botón flotante de WhatsApp ===== */
+.whatsapp-flotante {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--whatsapp);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+    transition: background .15s, transform .15s;
+}
+
+.whatsapp-flotante:hover {
+    background: var(--whatsapp-oscuro);
+    transform: scale(1.06);
+}
+
+.whatsapp-flotante .icono {
+    width: 1.9rem;
+    height: 1.9rem;
+}
+
+/* ===== 10. Catálogo y tarjetas ===== */
+.encabezado-seccion {
+    margin-bottom: 1rem;
+}
+
+.titulo-fila {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.titulo-fila h2 {
+    margin: 0;
+}
+
+.enlace-acento {
+    color: var(--acento-oscuro);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.enlace-acento:hover {
+    text-decoration: underline;
+}
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.filtros select {
+    min-height: 2.25rem;
+    padding: .35rem 1rem;
+    border-radius: 999px;
+}
+
+.grilla {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.tarjeta {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--fondo);
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.tarjeta-imagen {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1 / 1;
+    background: var(--fondo-suave);
+}
+
+.tarjeta-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sin-imagen {
+    color: var(--borde);
+}
+
+.sin-imagen .icono {
+    width: 3rem;
+    height: 3rem;
+}
+
+.tarjeta-cuerpo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: .25rem;
+    padding: 1rem;
+}
+
+.tarjeta-cuerpo h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.tarjeta-cuerpo h3 a {
+    text-decoration: none;
+}
+
+.tarjeta-cuerpo p {
+    margin: 0;
+}
+
+.tarjeta-accion {
+    margin-top: auto;
+    padding-top: .75rem;
+}
+
+.tarjeta-accion form {
+    margin: 0;
+}
+
+.precio {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--acento-oscuro);
+}
+
+/* ===== 11. Portada y páginas de texto ===== */
+.portada {
+    margin-bottom: 2rem;
+    padding: 3rem 1rem 2.5rem;
+    text-align: center;
+    border-radius: var(--radio);
+    background: linear-gradient(180deg, var(--acento-suave), var(--fondo));
+}
+
+.portada h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.portada p {
+    max-width: 36rem;
+    margin-inline: auto;
+    color: var(--texto-suave);
+}
+
+.portada .acciones {
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.portada .acciones .boton {
+    flex: 0 1 16rem;
+}
+
+.foto-historia {
+    margin: 0 0 1rem;
+}
+
+.foto-historia img {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: var(--radio);
+}
+
+.mapa iframe {
+    width: 100%;
+    height: 320px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+}
+
+/* ===== 12. Pantallas pendientes (pasos 3 y 4) ===== */
+.total {
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
 .en-linea {
@@ -211,99 +729,33 @@ header nav button {
 
 .en-linea input {
     width: 5rem;
-    padding: .4rem;
-    border: 1px solid #111;
 }
 
 .en-linea button,
 .tabla button {
-    padding: .4rem .8rem;
-    border: 1px solid #111;
-    background: #fff;
+    padding: .4rem 1rem;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    background: var(--fondo);
+    font: inherit;
     cursor: pointer;
 }
 
-.total {
-    font-weight: 700;
-    font-size: 1.2rem;
+.detalle {
+    display: grid;
+    gap: 1.5rem;
 }
 
-.boton {
-    display: inline-block;
-    padding: .6rem 1.2rem;
-    background: #111;
-    color: #fff;
-    text-decoration: none;
-}
-
-.formulario ul {
-    list-style: none;
-    padding: 0;
-}
-
-body {
-    padding-bottom: 4.5rem;
-}
-
-.whatsapp-flotante {
-    position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 10;
-    padding: .7rem 1.1rem;
-    background: #111;
-    color: #fff;
-    border: 2px solid #fff;
-    border-radius: 999px;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
-}
-
-.whatsapp-flotante:hover {
-    background: #333;
-}
-
-header .marca {
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-header nav {
-    flex-wrap: wrap;
-    gap: .5rem 1rem;
-}
-
-header nav a {
-    font-weight: 400;
-}
-
-.portada {
-    padding: 2rem 0;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 1.5rem;
-}
-
-.botones {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .75rem;
-}
-
-.foto-historia {
-    margin: 0 0 1rem;
-}
-
-.foto-historia img {
+.detalle img {
     width: 100%;
-    max-height: 360px;
-    object-fit: cover;
-    border-radius: 8px;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: var(--radio);
+    background: var(--fondo-suave);
 }
 
-.mapa iframe {
-    width: 100%;
-    height: 320px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+@media (min-width: 700px) {
+    .detalle {
+        grid-template-columns: 1fr 1fr;
+    }
 }

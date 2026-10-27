@@ -8,33 +8,17 @@
     <title>{% block title %}Inicio{% endblock %} · {{ negocio.nombre }} · {{ negocio.ciudad }}</title>
     <meta name="description"
         content="{% block description %}{{ negocio.nombre }} en {{ negocio.ciudad }}: insumos y máquinas.{% endblock %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <script src="{% static 'js/sitio.js' %}" defer></script>
 </head>
-<a class="whatsapp-flotante" href="{{ whatsapp_url }}" target="_blank" rel="noopener"
-    aria-label="Escribinos por WhatsApp">WhatsApp</a>
 
 <body>
-    <header>
-        <a class="marca" href="{% url 'paginas:inicio' %}">{{ negocio.nombre }}</a>
-        <nav>
-            <a href="{% url 'catalogo:listado' %}">Catálogo</a>
-            <a href="{% url 'paginas:historia' %}">Nuestra historia</a>
-            <a href="{% url 'paginas:contacto' %}">Contacto</a>
-            <a href="{% url 'pedidos:carrito' %}">Carrito ({{ carrito_cantidad }})</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>
-            <span>Hola, {{ user.username }}</span>
-            <form method="post" action="{% url 'cuentas:logout' %}">
-                {% csrf_token %}
-                <button type="submit">Salir</button>
-            </form>
-            {% else %}
-            <a href="{% url 'cuentas:login' %}">Ingresar</a>
-            <a href="{% url 'cuentas:registro' %}">Registrarse</a>
-            {% endif %}
-        </nav>
-    </header>
-    <main>
+    {% include "partes/cabecera.html" %}
+
+    <main class="contenedor">
         {% if messages %}
         <ul class="mensajes">
             {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
@@ -42,6 +26,13 @@
         {% endif %}
         {% block content %}{% endblock %}
     </main>
+
+    {% include "partes/pie.html" %}
+
+    <a class="whatsapp-flotante" href="{{ whatsapp_url }}" target="_blank" rel="noopener"
+        aria-label="Escribinos por WhatsApp">
+        {% include "partes/icono.html" with nombre="whatsapp" %}
+    </a>
 </body>
 
 </html>

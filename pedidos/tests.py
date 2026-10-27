@@ -60,4 +60,18 @@ class CarritoTests(TestCase):
         r = self.agregar(self.cinta, 2)
         self.assertEqual(r.context["total"], Decimal("3000"))
 
+    def test_agregar_vuelve_a_la_pagina_de_origen(self):
+        r = self.client.post(
+            reverse("pedidos:agregar", args=[self.cinta.pk]),
+            {"cantidad": 1, "next": "/catalogo/"},
+        )
+        self.assertRedirects(r, "/catalogo/")
+
+    def test_agregar_ignora_destinos_externos(self):
+        r = self.client.post(
+            reverse("pedidos:agregar", args=[self.cinta.pk]),
+            {"cantidad": 1, "next": "https://sitio-externo.example/"},
+        )
+        self.assertRedirects(r, reverse("pedidos:carrito"))
+
 # Create your tests here.

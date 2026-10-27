@@ -66,3 +66,22 @@ class PaginasTests(TestCase):
                 self.assertIsNotNone(descripcion, f"No se encontró la meta description en {url}")
                 descripciones.add(descripcion.group(1))
         self.assertEqual(len(descripciones), 3)
+        
+    def test_la_cabecera_tiene_marca_menu_y_buscador(self):
+        r = self.client.get(reverse("paginas:inicio"))
+        self.assertContains(r, '<span class="acento">Negocio</span>')
+        self.assertContains(r, 'role="search"')
+        for texto in ["Catálogo", "Nuestra historia", "Contacto"]:
+            self.assertContains(r, texto)
+
+    def test_el_contador_del_carrito_aparece_con_productos(self):
+        producto = Producto.objects.filter(stock__gt=0).first()
+        self.client.post(
+            reverse("pedidos:agregar", args=[producto.pk]), {"cantidad": 2}
+        )
+        r = self.client.get(reverse("paginas:inicio"))
+        self.assertContains(r, '<span class="contador">2</span>')
+        
+    def test_el_inicio_permite_agregar_productos_al_carrito(self):
+        r = self.client.get(reverse("paginas:inicio"))
+        self.assertContains(r, "Añadir al carrito")

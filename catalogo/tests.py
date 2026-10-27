@@ -45,3 +45,14 @@ class CatalogoTests(TestCase):
     def test_detalle_inexistente_da_404(self):
         r = self.client.get(reverse("catalogo:detalle", args=[9999]))
         self.assertEqual(r.status_code, 404)
+        
+    def test_la_tarjeta_permite_agregar_al_carrito(self):
+        cinta = Producto.objects.get(nombre="Cinta métrica")
+        r = self.client.get(self.url)
+        self.assertContains(r, reverse("pedidos:agregar", args=[cinta.pk]))
+        self.assertContains(r, "Añadir al carrito")
+
+    def test_el_producto_sin_stock_tiene_el_boton_deshabilitado(self):
+        r = self.client.get(self.url)
+        self.assertContains(r, "Sin stock")
+        self.assertContains(r, "disabled")

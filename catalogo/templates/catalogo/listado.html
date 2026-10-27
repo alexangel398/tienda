@@ -3,41 +3,32 @@
 {% block title %}Catálogo{% endblock %}
 
 {% block content %}
-<h1>Catálogo</h1>
+<div class="encabezado-seccion">
+    <h1>Catálogo</h1>
+    <p class="texto-suave">{% if q %}Resultados para “{{ q }}”{% else %}Elegí por categoría o por marca.{% endif %}</p>
+</div>
 
 <form method="get" class="filtros">
-    <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o marca">
-    <select name="categoria">
+    <input type="hidden" name="q" value="{{ q }}">
+    <select name="categoria" data-autoenviar aria-label="Categoría">
         <option value="">Todas las categorías</option>
         {% for c in categorias %}
         <option value="{{ c.id }}" {% if c.id == categoria_id %}selected{% endif %}>{{ c.nombre }}</option>
         {% endfor %}
     </select>
-
-    <select name="marca">
+    <select name="marca" data-autoenviar aria-label="Marca">
         <option value="">Todas las marcas</option>
         {% for m in marcas %}
         <option value="{{ m.id }}" {% if m.id == marca_id %}selected{% endif %}>{{ m.nombre }}</option>
         {% endfor %}
     </select>
-
-    <button type="submit">Filtrar</button>
-    <a href="{% url 'catalogo:listado' %}">Limpiar</a>
+    <noscript><button class="boton boton-borde boton-chico" type="submit">Filtrar</button></noscript>
+    <a class="boton boton-borde boton-chico" href="{% url 'catalogo:listado' %}">Limpiar</a>
 </form>
 
 <div class="grilla">
     {% for p in productos %}
-    <article class="tarjeta">
-        <a href="{% url 'catalogo:detalle' p.pk %}">
-            {% if p.imagen %}
-            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
-            {% endif %}
-            <h2>{{ p.nombre }}</h2>
-        </a>
-        <p>{{ p.marca }} · {{ p.categoria }}</p>
-        <p class="precio">${{ p.precio }}</p>
-        <p>{% if p.stock > 0 %}Disponible{% else %}Sin stock{% endif %}</p>
-    </article>
+    {% include "partes/tarjeta_producto.html" %}
     {% empty %}
     <p>No hay productos con esos filtros.</p>
     {% endfor %}

@@ -1,0 +1,38 @@
+<footer class="pie">
+    <div class="contenedor pie-grilla">
+        <div>
+            <p class="marca">{% include "partes/marca.html" %}</p>
+            <p class="texto-suave">Insumos y máquinas en {{ negocio.ciudad }}.</p>
+            <ul class="pie-datos">
+                <li>{% include "partes/icono.html" with nombre="ubicacion" %}<span>{{ negocio.direccion }}</span></li>
+                <li>{% include "partes/icono.html" with nombre="reloj" %}<span>{{ negocio.horarios }}</span></li>
+                <li>{% include "partes/icono.html" with nombre="mensaje" %}<a href="{{ whatsapp_url }}" target="_blank"
+                        rel="noopener">Escribinos por WhatsApp</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Navegación</h3>
+            <ul>
+                {% for e in enlaces %}<li><a href="{% url e.url %}">{{ e.texto }}</a></li>{% endfor %}
+                <li><a href="{% url 'pedidos:carrito' %}">Carrito</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Mi cuenta</h3>
+            <ul>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a></li>
+                {% else %}
+                <li><a href="{% url 'cuentas:login' %}">Iniciar sesión</a></li>
+                <li><a href="{% url 'cuentas:registro' %}">Regístrate</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="pie-inferior">
+        <div class="contenedor">© {% now "Y" %} {{ negocio.nombre }}. Todos los derechos reservados.</div>
+    </div>
+</footer>

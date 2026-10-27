@@ -1,3 +1,4 @@
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,6 +15,14 @@ def _cantidad(request, defecto=1):
     valor = request.POST.get("cantidad", "")
     return int(valor) if valor.isdigit() else defecto
 
+def _volver(request, defecto="pedidos:carrito"):
+    destino = request.POST.get("next", "")
+    if destino and url_has_allowed_host_and_scheme(
+        destino, allowed_hosts={request.get_host()}
+    ):
+        return redirect(destino)
+    return redirect(defecto)
+
 
 def ver_carrito(request):
     carrito = Carrito(request)
@@ -29,7 +38,7 @@ def agregar(request, pk):
         messages.success(request, f"{producto.nombre} se agregó al carrito.")
     else:
         messages.error(request, f"No hay stock suficiente de {producto.nombre}.")
-    return redirect("pedidos:carrito")
+    return _volver(request)
 
 
 @require_POST
