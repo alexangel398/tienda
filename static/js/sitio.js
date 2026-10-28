@@ -1,14 +1,78 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const boton = document.querySelector("[data-menu-boton]");
     const cabecera = document.querySelector(".cabecera");
-    if (boton && cabecera) {
-        boton.addEventListener("click", () => {
+    const botonMenu = document.querySelector("[data-menu-boton]");
+    const modal = document.querySelector("[data-modal]");
+
+    if (cabecera && botonMenu) {
+        botonMenu.addEventListener("click", () => {
             const abierto = cabecera.classList.toggle("menu-abierto");
-            boton.setAttribute("aria-expanded", String(abierto));
+            botonMenu.setAttribute("aria-expanded", String(abierto));
         });
     }
 
-    document.querySelectorAll("[data-autoenviar]").forEach((campo) => {
-        campo.addEventListener("change", () => campo.form.submit());
+    // Los campos con data-autoenviar envían su formulario al cambiar.
+    document.addEventListener("change", (e) => {
+        if (e.target.matches("[data-autoenviar]")) e.target.form.submit();
+    });
+
+    document.addEventListener("click", async (e) => {
+        // Selector de cantidad: − y +
+        const paso = e.target.closest("[data-cantidad-menos], [data-cantidad-mas]");
+        if (paso) {
+            const campo = paso.closest("[data-selector]").querySelector("input");
+            const delta = paso.hasAttribute("data-cantidad-mas") ? 1 : -1;
+            const minimo = Number(campo.min || 0);
+            const maximo = campo.max ? Number(campo.max) : Infinity;
+            const nuevo = Math.min(maximo, Math.max(minimo, Number(campo.value || 0) + delta));
+            if (nuevo !== Number(campo.value)) {
+                campo.value = nuevo;
+                campo.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            return;
+        }
+
+        // Vista rápida: carga la ficha dentro de la ventana
+        const abrir = e.target.closest("[data-vista-rapida]");
+        if (abrir && modal) {
+            const contenido = modal.querySelector("[data-modal-contenido]");
+            contenido.innerHTML = '<p class="texto-suave">Cargando...</p>';
+            modal.showModal();
+            try {
+                const respuesta = await fetch(abrir.dataset.vistaRapida);
+                if (!respuesta.ok) throw new Error("Respuesta inválida");
+                contenido.innerHTML = await respuesta.text();
+                contenido.querySelectorAll('input[name="next"]').forEach((campo) => {
+                    campo.value = location.pathname + location.search;
+                });
+            } catch {
+                contenido.innerHTML = "<p>No se pudo cargar el producto.</p>";
+            }
+            return;
+        }
+
+        // Cerrar la ventana: botón o clic fuera
+        if (modal && (e.target.closest("[data-modal-cerrar]") || e.target === modal)) {
+            modal.close();
+            return;
+        }
+
+        // Compartir: menú del sistema o copiar el enlace
+        const compartir = e.target.closest("[data-compartir]");
+        if (compartir) {
+            const { url, titulo } = compartir.dataset;
+            try {
+                if (navigator.share) {
+                    await navigator.share({ title: titulo, url });
+                } else {
+                    await navigator.clipboard.writeText(url);
+                    const texto = compartir.querySelector("span");
+                    const original = texto.textContent;
+                    texto.textContent = "Enlace copiado";
+                    setTimeout(() => { texto.textContent = original; }, 2000);
+                }
+            } catch {
+                /* el usuario canceló o el navegador no lo permite */
+            }
+        }
     });
 });

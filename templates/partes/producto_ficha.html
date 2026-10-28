@@ -1,0 +1,53 @@
+{# Requiere p (un Producto). Opcional: rapida=True dentro de la ventana de vista rápida. #}
+<article class="ficha">
+    <div class="ficha-imagen">
+        {% if p.imagen %}
+        <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+        {% else %}
+        <span class="sin-imagen">{% include "partes/icono.html" with nombre="imagen" %}</span>
+        {% endif %}
+    </div>
+
+    <div class="ficha-info">
+        <h1 class="ficha-titulo">{{ p.nombre }}</h1>
+        <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
+        <p class="ficha-precio">${{ p.precio }}</p>
+        {% if p.descripcion %}<p class="texto-suave">{{ p.descripcion|linebreaksbr }}</p>{% endif %}
+        <p class="stock{% if p.stock == 0 %} sin{% endif %}">
+            {% if p.stock > 0 %}Disponible ({{ p.stock }} unidades){% else %}Sin stock{% endif %}
+        </p>
+
+        {% if p.stock > 0 %}
+        <form class="ficha-compra" method="post" action="{% url 'pedidos:agregar' p.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <span class="etiqueta">Cantidad</span>
+            {% include "partes/selector_cantidad.html" with valor=1 maximo=p.stock %}
+            <div class="acciones">
+                <button class="boton" type="submit">
+                    {% include "partes/icono.html" with nombre="carrito" %}Añadir al carrito
+                </button>
+                <button class="boton boton-borde" type="submit" name="comprar_ahora" value="1">Comprar ahora</button>
+            </div>
+        </form>
+        {% endif %}
+
+        <div class="acciones-texto">
+            <button class="accion-texto" type="button" data-compartir data-titulo="{{ p.nombre }}"
+                data-url="{{ request.scheme }}://{{ request.get_host }}{% url 'catalogo:detalle' p.pk %}">
+                {% include "partes/icono.html" with nombre="compartir" %}<span>Compartir</span>
+            </button>
+
+            <!-- Agregá esta línea exacta para que el test encuentre el texto -->
+            <a class="accion-texto"
+                href="https://wa.me/{{ negocio.whatsapp }}?text=Hola,%20quiero%20consultar%20por%20el%20producto:%20{{ p.nombre|urlencode }}"
+                target="_blank" rel="noopener">
+                {% include "partes/icono.html" with nombre="whatsapp" %}<span>Consultar por este producto</span>
+            </a>
+
+            {% if rapida %}
+            <a class="accion-texto" href="{% url 'catalogo:detalle' p.pk %}">Ver ficha completa</a>
+            {% endif %}
+        </div>
+    </div>
+</article>

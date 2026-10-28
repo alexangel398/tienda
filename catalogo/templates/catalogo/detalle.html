@@ -1,35 +1,28 @@
 {% extends "base.html" %}
 
 {% block title %}{{ producto.nombre }}{% endblock %}
+{% block description %}{{ producto.nombre }} de {{ producto.marca }} en {{ negocio.nombre }}, {{ negocio.ciudad }}.{% endblock %}
 
 {% block content %}
-<p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
+<a class="enlace-volver" href="{% url 'catalogo:listado' %}">
+    {% include "partes/icono.html" with nombre="flecha-izquierda" %}Volver a la tienda
+</a>
 
-<article class="detalle">
-    {% if producto.imagen %}
-    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-    {% endif %}
-    <div>
-        <h1>{{ producto.nombre }}</h1>
-        <p>{{ producto.marca }} · {{ producto.categoria }}</p>
-        <p class="precio">${{ producto.precio }}</p>
-        <p>{% if producto.stock > 0 %}Disponible ({{ producto.stock }} unidades){% else %}Sin stock{% endif %}</p>
-        {% if producto.stock > 0 %}
-        <form method="post" action="{% url 'pedidos:agregar' producto.pk %}" class="en-linea">
-            {% csrf_token %}
-            <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}">
-            <button type="submit">Agregar al carrito</button>
-        </form>
-        {% else %}
-        <p>Producto agotado</p>
-        {% endif %}
+{% include "partes/producto_ficha.html" with p=producto %}
+{% include "partes/beneficios.html" %}
 
-        {% with mensaje="Hola, quiero consultar por "|add:producto.nombre %}
-        <p><a class="boton" href="https://wa.me/{{ negocio.whatsapp }}?text={{ mensaje|urlencode }}" target="_blank"
-                rel="noopener">Consultar por este producto</a></p>
-        {% endwith %}
-        
-        <p>{{ producto.descripcion|linebreaksbr }}</p>
+{% if relacionados %}
+<section>
+    <div class="titulo-fila">
+        <h2>Productos relacionados</h2>
+        <a class="enlace-acento" href="{% url 'catalogo:listado' %}?categoria={{ producto.categoria_id }}">Ver todo</a>
     </div>
-</article>
+    <div class="grilla grilla-relacionados">
+        {% for r in relacionados %}
+            {% include "partes/tarjeta_producto.html" with p=r minima=True %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+<!-- Este es el que faltaba o quedaba colgado -->
 {% endblock %}

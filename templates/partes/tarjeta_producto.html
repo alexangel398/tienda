@@ -1,16 +1,42 @@
-{# Requiere la variable p (un Producto). #}
-<article class="tarjeta">
-    <a class="tarjeta-imagen" href="{% url 'catalogo:detalle' p.pk %}">
-        {% if p.imagen %}
-        <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" loading="lazy">
+{# Requiere p (un Producto). Opcional: minima=True para la versión de productos relacionados. #}
+<article class="tarjeta{% if minima %} tarjeta-minima{% endif %}">
+    <div class="tarjeta-imagen">
+        <a href="{% url 'catalogo:detalle' p.pk %}">
+            {% if p.imagen %}
+            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" loading="lazy">
+            {% else %}
+            <span class="sin-imagen">
+                {% include "partes/icono.html" with nombre="imagen" %}
+            </span>
+            {% endif %}
+        </a>
+
+        {% if minima %}
+            {% if p.stock > 0 %}
+            <form class="agregar-rapido" method="post" action="{% url 'pedidos:agregar' p.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="cantidad" value="1">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" aria-label="Añadir {{ p.nombre }} al carrito">
+                    {% include "partes/icono.html" with nombre="bolsa" %}
+                </button>
+            </form>
+            {% endif %}
         {% else %}
-        <span class="sin-imagen">{% include "partes/icono.html" with nombre="imagen" %}</span>
+            <button type="button" class="vista-rapida" data-vista-rapida="{% url 'catalogo:rapida' p.pk %}">
+                {% include "partes/icono.html" with nombre="ojo" %} Vista rápida
+            </button>
         {% endif %}
-    </a>
+    </div>
+
     <div class="tarjeta-cuerpo">
         <h3><a href="{% url 'catalogo:detalle' p.pk %}">{{ p.nombre }}</a></h3>
+        {% if not minima %}
         <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
+        {% endif %}
         <p class="precio">${{ p.precio }}</p>
+
+        {% if not minima %}
         <div class="tarjeta-accion">
             {% if p.stock > 0 %}
             <form method="post" action="{% url 'pedidos:agregar' p.pk %}">
@@ -25,5 +51,6 @@
             <button class="boton boton-bloque" type="button" disabled>Sin stock</button>
             {% endif %}
         </div>
+        {% endif %}
     </div>
 </article>

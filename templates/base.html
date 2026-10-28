@@ -29,6 +29,12 @@
 
     {% include "partes/pie.html" %}
 
+    <dialog class="modal" data-modal aria-label="Vista rápida del producto">
+        <button type="button" class="modal-cerrar" data-modal-cerrar aria-label="Cerrar">
+            {% include "partes/icono.html" with nombre="cerrar" %}</button>
+        <div class="modal-cuerpo" data-modal-contenido></div>
+    </dialog>
+
     <a class="whatsapp-flotante" href="{{ whatsapp_url }}" target="_blank" rel="noopener"
         aria-label="Escribinos por WhatsApp">
         {% include "partes/icono.html" with nombre="whatsapp" %}

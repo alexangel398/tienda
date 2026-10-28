@@ -3,50 +3,70 @@
 {% block title %}Carrito{% endblock %}
 
 {% block content %}
-<h1>Carrito</h1>
+<div class="contenedor">
+    <h1>Carrito</h1>
 
-{% if items %}
-<div class="tabla-scroll">
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i in items %}
-            <tr>
-                <td><a href="{% url 'catalogo:detalle' i.producto.pk %}">{{ i.producto.nombre }}</a></td>
-                <td>${{ i.producto.precio }}</td>
-                <td>
-                    <form method="post" action="{% url 'pedidos:actualizar' i.producto.pk %}" class="en-linea">
-                        {% csrf_token %}
-                        <input type="number" name="cantidad" value="{{ i.cantidad }}" min="0"
-                            max="{{ i.producto.stock }}">
-                        <button type="submit">Cambiar</button>
-                    </form>
-                </td>
-                <td>${{ i.subtotal }}</td>
-                <td>
-                    <form method="post" action="{% url 'pedidos:quitar' i.producto.pk %}">
-                        {% csrf_token %}
-                        <button type="submit">Quitar</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if items %}
+    <div class="tabla-scroll">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in items %}
+                <tr>
+                    <td><a href="{% url 'catalogo:detalle' i.producto.pk %}">{{ i.producto.nombre }}</a></td>
+                    <td>${{ i.producto.precio }}</td>
+                    <td>
+                        <form method="post" action="{% url 'pedidos:actualizar' i.producto.pk %}" class="en-linea">
+                            {% csrf_token %}
+                            {% include "partes/selector_cantidad.html" with valor=i.cantidad maximo=i.producto.stock autoenviar=True %}
+                        </form>
+                    </td>
+                    <td>${{ i.subtotal }}</td>
+                    <td>
+                        <form method="post" action="{% url 'pedidos:quitar' i.producto.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="boton boton-borde boton-chico">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <a class="enlace-volver" href="{% url 'catalogo:listado' %}">{% include "partes/icono.html" with nombre="flecha-izquierda" %} Seguir comprando</a>
+        <div style="text-align: right;">
+            <p class="total" style="margin-bottom: 1rem;">Total: ${{ total }}</p>
+            <a class="boton" href="{% url 'pedidos:confirmar' %}">Confirmar pedido</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="carrito-vacio" style="text-align: center; max-width: 480px; margin-inline: auto; padding-block: 3rem;">
+        <div class="icono-vacio" style="display: grid; place-items: center; width: 4rem; height: 4rem; margin-inline: auto; margin-bottom: 1.25rem; color: var(--texto-suave);">
+            {% include "partes/icono.html" with nombre="bolsa" %}
+        </div>
+        
+        <h2 style="font-size: 1.75rem; margin-bottom: .5rem;">Tu carrito está vacío</h2>
+        <p class="texto-suave" style="margin-bottom: 1.5rem;">Parece que aún no has añadido nada a tu carrito.</p>
+
+        <div class="acciones-vacio" style="margin-bottom: 2rem;">
+            <a class="boton" href="{% url 'catalogo:listado' %}">Continuar comprando</a>
+        </div>
+
+        <div class="detalles-seguridad" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; font-size: .9rem; color: var(--texto-suave); border-top: 1px solid var(--borde); padding-top: 1.5rem;">
+            <span style="display: inline-flex; align-items: center; gap: .4rem;">{% include "partes/icono.html" with nombre="reloj" %} Envío rápido en Buenos Aires</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem;">{% include "partes/icono.html" with nombre="escudo" %} Pago seguro</span>
+        </div>
+    </div>
+    {% endif %}
 </div>
-<p class="total">Total: ${{ total }}</p>
-<p><a class="boton" href="{% url 'pedidos:confirmar' %}">Confirmar pedido</a></p>
-{% else %}
-<p>El carrito está vacío.</p>
-{% endif %}
-
-<p><a href="{% url 'catalogo:listado' %}">← Seguir comprando</a></p>
 {% endblock %}

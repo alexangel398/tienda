@@ -1,0 +1,23 @@
+<section class="beneficios" aria-label="Cómo comprar">
+    <div class="beneficio">
+        <span class="beneficio-icono">{% include "partes/icono.html" with nombre="ubicacion" %}</span>
+        <div>
+            <h3>Retiro en el local</h3>
+            <p>{{ negocio.direccion }}</p>
+        </div>
+    </div>
+    <div class="beneficio">
+        <span class="beneficio-icono">{% include "partes/icono.html" with nombre="escudo" %}</span>
+        <div>
+            <h3>Pago a coordinar</h3>
+            <p>Transferencia o efectivo, sin cobros online.</p>
+        </div>
+    </div>
+    <div class="beneficio">
+        <span class="beneficio-icono">{% include "partes/icono.html" with nombre="mensaje" %}</span>
+        <div>
+            <h3>Consultas por WhatsApp</h3>
+            <p>Te respondemos por el chat.</p>
+        </div>
+    </div>
+</section>

@@ -36,4 +36,12 @@ def detalle(request, pk):
     producto = get_object_or_404(
         Producto.objects.select_related("categoria", "marca"), pk=pk
     )
-    return render(request, "catalogo/detalle.html", {"producto": producto})
+    contexto = {"producto": producto, "relacionados": producto.relacionados()}
+    return render(request, "catalogo/detalle.html", contexto)
+
+
+def rapida(request, pk):
+    producto = get_object_or_404(
+        Producto.objects.select_related("categoria", "marca"), pk=pk
+    )
+    return render(request, "partes/producto_ficha.html", {"p": producto, "rapida": True})

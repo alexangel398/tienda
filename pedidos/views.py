@@ -35,6 +35,8 @@ def agregar(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     cantidad = max(_cantidad(request), 1)
     if Carrito(request).agregar(producto, cantidad):
+        if request.POST.get("comprar_ahora"):
+            return redirect("pedidos:confirmar")
         messages.success(request, f"{producto.nombre} se agregó al carrito.")
     else:
         messages.error(request, f"No hay stock suficiente de {producto.nombre}.")

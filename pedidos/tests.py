@@ -73,5 +73,20 @@ class CarritoTests(TestCase):
             {"cantidad": 1, "next": "https://sitio-externo.example/"},
         )
         self.assertRedirects(r, reverse("pedidos:carrito"))
+    def test_comprar_ahora_agrega_y_va_a_confirmar(self):
+        r = self.client.post(
+            reverse("pedidos:agregar", args=[self.cinta.pk]),
+            {"cantidad": 1, "comprar_ahora": "1"},
+        )
+        self.assertRedirects(
+            r, reverse("pedidos:confirmar"), fetch_redirect_response=False
+        )
+        self.assertEqual(self.client.session["carrito"], {str(self.cinta.pk): 1})
 
+    def test_comprar_ahora_sin_stock_no_va_a_confirmar(self):
+        r = self.client.post(
+            reverse("pedidos:agregar", args=[self.taladro.pk]),
+            {"cantidad": 1, "comprar_ahora": "1"},
+        )
+        self.assertRedirects(r, reverse("pedidos:carrito"))
 # Create your tests here.

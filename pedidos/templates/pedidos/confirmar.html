@@ -3,19 +3,28 @@
 {% block title %}Confirmar pedido{% endblock %}
 
 {% block content %}
-<h1>Confirmar pedido</h1>
+<div class="seccion-centrada">
+    <div class="formulario formulario-tarjeta">
+        <h1 style="text-align: center; margin-top: 0; font-size: 1.75rem; margin-bottom: 1.25rem;">Confirmar pedido</h1>
 
-<ul>
-    {% for i in items %}
-    <li>{{ i.cantidad }} x {{ i.producto.nombre }} — ${{ i.subtotal }}</li>
-    {% endfor %}
-</ul>
-<p class="total">Total: ${{ total }}</p>
+        <div class="resumen-pedido" style="margin-bottom: 1.5rem; background: var(--fondo-suave); padding: 1rem; border-radius: var(--radio-chico); border: 1px solid var(--borde);">
+            <ul class="lista-resumen" style="list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; gap: 0.25rem;">
+                {% for i in items %}
+                <li>{{ i.cantidad }} x {{ i.producto.nombre }} — ${{ i.subtotal }}</li>
+                {% endfor %}
+            </ul>
+            <p class="total" style="margin: 0;">Total: ${{ total }}</p>
+        </div>
 
-<form method="post" class="formulario">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Confirmar pedido</button>
-</form>
-<p><a href="{% url 'pedidos:carrito' %}">← Volver al carrito</a></p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="acciones-formulario" style="margin-top: 1.5rem; display: grid; gap: 1rem; text-align: center;">
+                <button class="boton boton-bloque" type="submit">Confirmar pedido</button>
+                <a class="enlace-volver-centro" href="{% url 'pedidos:carrito' %}">← Volver al carrito</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

@@ -10,10 +10,12 @@ WhatsApp.{% endblock %}
 <p><strong>Horarios:</strong> {{ negocio.horarios }}</p>
 
 <div class="acciones">
-    <a class="boton" href="https://www.google.com/maps/search/?api=1&amp;query={{ negocio.direccion|urlencode }}"
-        target="_blank" rel="noopener">Cómo llegar</a>
-    <a class="boton boton-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{% include
-        "partes/icono.html" with nombre="whatsapp" %}Escribir por WhatsApp</a>
+    <a class="boton" href="https://www.google.com/maps/search/?api=1&query={{ negocio.direccion|urlencode }}" target="_blank" rel="noopener">
+        Cómo llegar
+    </a>
+    <a class="boton boton-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+        {% include "partes/icono.html" with nombre="whatsapp" %} Escribir por WhatsApp
+    </a>
 </div>
 
 <div class="mapa">

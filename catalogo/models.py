@@ -48,3 +48,10 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def relacionados(self, limite=4):
+        return (
+            Producto.objects.filter(categoria_id=self.categoria_id)
+            .exclude(pk=self.pk)
+            .select_related("marca", "categoria")[:limite]
+        )
