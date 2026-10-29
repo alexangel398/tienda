@@ -3,13 +3,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
-
+from django.conf import settings
 from catalogo.models import Producto
 
 from .forms import PedidoForm
 from .models import Pedido
-from .services import Carrito, StockInsuficiente, crear_pedido
-
+from .services import Carrito, StockInsuficiente, crear_pedido, mensaje_pedido, url_whatsapp
 
 def _cantidad(request, defecto=1):
     valor = request.POST.get("cantidad", "")
@@ -88,7 +87,10 @@ def confirmar(request):
 @login_required
 def exito(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk, cliente=request.user)
-    return render(request, "pedidos/exito.html", {"pedido": pedido})
+    url = url_whatsapp(settings.NEGOCIO["whatsapp"], mensaje_pedido(pedido))
+    return render(
+        request, "pedidos/exito.html", {"pedido": pedido, "whatsapp_pedido_url": url}
+    )
 
 @login_required
 def mis_pedidos(request):

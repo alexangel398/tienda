@@ -1,3 +1,6 @@
+import re
+from urllib.parse import quote
+from django.conf import settings
 from decimal import Decimal
 from django.db import transaction
 from catalogo.models import Producto
@@ -126,6 +129,11 @@ TRANSICIONES = {
 class TransicionInvalida(Exception):
     pass
 
+def reponer_stock(pedido):
+    for detalle in pedido.detalles.all():
+        Producto.objects.filter(pk=detalle.producto_id).update(
+            stock=F("stock") + detalle.cantidad
+        )
 
 def cambiar_estado(pedido, nuevo_estado):
     with transaction.atomic():
@@ -138,10 +146,30 @@ def cambiar_estado(pedido, nuevo_estado):
                 f"a {Pedido.Estado(nuevo_estado).label}."
             )
         if nuevo_estado == Pedido.Estado.CANCELADO:
-            for detalle in pedido.detalles.all():
-                Producto.objects.filter(pk=detalle.producto_id).update(
-                    stock=F("stock") + detalle.cantidad
-                )
+            reponer_stock(pedido)
         pedido.estado = nuevo_estado
         pedido.save(update_fields=["estado"])
     return pedido
+
+def telefono_internacional(telefono):
+    digitos = re.sub(r"\D", "", telefono).lstrip("0")
+    return digitos if digitos.startswith("54") else f"549{digitos}"
+
+
+def url_whatsapp(numero, mensaje):
+    return f"https://wa.me/{numero}?text={quote(mensaje)}"
+
+
+def mensaje_pedido(pedido):
+    lineas = [f"Hola, hice el pedido #{pedido.pk} en {settings.NEGOCIO['nombre']}:", ""]
+    for d in pedido.detalles.select_related("producto"):
+        lineas.append(f"- {d.cantidad} x {d.producto.nombre} (${d.subtotal:.2f})")
+    lineas += [
+        "",
+        f"Total: ${pedido.total:.2f}",
+        f"Entrega: {pedido.get_entrega_display()}",
+    ]
+    if pedido.direccion:
+        lineas.append(f"Dirección: {pedido.direccion}")
+    lineas += [f"Teléfono: {pedido.telefono}", f"Cliente: {pedido.cliente.get_username()}"]
+    return "\n".join(lineas)

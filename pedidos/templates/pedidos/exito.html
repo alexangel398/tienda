@@ -26,7 +26,12 @@
 </table>
 <p class="total">Total: ${{ pedido.total }}</p>
 
-<p>El pago y la entrega se coordinan directamente con el negocio. Podés escribirnos por WhatsApp.</p>
+<div class="acciones">
+    <a class="boton boton-whatsapp" href="{{ whatsapp_pedido_url }}" target="_blank" rel="noopener">
+        {% include "partes/icono.html" with nombre="whatsapp" %}Enviar mi pedido por WhatsApp</a>
+</div>
+<p class="texto-suave">Tu pedido ya quedó registrado. Enviá el mensaje para coordinar el pago y la entrega con el
+    negocio.</p>
 <p><a href="{% url 'pedidos:mis_pedidos' %}">Ver mis pedidos</a></p>
 <p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
 {% endblock %}
