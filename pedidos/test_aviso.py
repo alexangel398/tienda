@@ -31,11 +31,15 @@ class AvisoAlDuenoTests(BaseTests):
         self.assertIn("Teléfono: 1155551111", texto)
         self.assertIn("Cliente: ana", texto)
 
-    def test_el_mensaje_incluye_la_direccion_si_hay_envio(self):
+    def test_el_mensaje_avisa_que_el_envio_se_coordina_por_el_chat(self):
         pedido = self.pedido_con_detalle()
-        pedido.direccion = "Calle 1"
+        pedido.entrega = Pedido.Entrega.ENVIO
         pedido.save()
-        self.assertIn("Dirección: Calle 1", mensaje_pedido(pedido))
+        self.assertIn("Dirección: a coordinar por este chat", mensaje_pedido(pedido))
+
+    def test_el_mensaje_no_menciona_direccion_si_es_retiro(self):
+        pedido = self.pedido_con_detalle()
+        self.assertNotIn("Dirección", mensaje_pedido(pedido))
 
     def test_la_url_de_whatsapp_codifica_el_mensaje(self):
         self.assertEqual(

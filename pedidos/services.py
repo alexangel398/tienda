@@ -169,7 +169,7 @@ def mensaje_pedido(pedido):
         f"Total: ${pedido.total:.2f}",
         f"Entrega: {pedido.get_entrega_display()}",
     ]
-    if pedido.direccion:
-        lineas.append(f"Dirección: {pedido.direccion}")
+    if pedido.entrega == Pedido.Entrega.ENVIO:
+        lineas.append("Dirección: a coordinar por este chat")
     lineas += [f"Teléfono: {pedido.telefono}", f"Cliente: {pedido.cliente.get_username()}"]
     return "\n".join(lineas)

@@ -11,7 +11,8 @@ class PedidoForm(forms.ModelForm):
         fields = ["entrega", "telefono"]
         widgets = {"entrega": forms.RadioSelect}
         help_texts = {
-            "telefono": "Con código de área, sin 0 ni 15. Ejemplo: 1155551234. Lo usamos para coordinar tu pedido por WhatsApp."
+            "entrega": "Si elegís envío, coordinamos la dirección con vos por WhatsApp.",
+            "telefono": "Con código de área, sin 0 ni 15. Ejemplo: 1155551234. Lo usamos para coordinar tu pedido por WhatsApp.",
         }
 
     def clean_telefono(self):

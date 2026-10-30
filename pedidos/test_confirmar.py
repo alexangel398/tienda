@@ -64,16 +64,14 @@ class ConfirmarPedidoTests(TestCase):
         self.producto.refresh_from_db()
         self.assertEqual(self.producto.stock, 1)
 
-    def test_envio_sin_direccion_es_rechazado(self):
+    def test_el_envio_no_pide_direccion_porque_se_coordina_por_whatsapp(self):
         self.client.force_login(self.usuario)
         self.cargar_carrito(1)
         r = self.client.post(self.url, {**DATOS, "entrega": "envio"})
 
-        self.assertEqual(r.status_code, 200)
-        self.assertIn("direccion", r.context["form"].errors)
-        self.assertEqual(Pedido.objects.count(), 0)
-        self.producto.refresh_from_db()
-        self.assertEqual(self.producto.stock, 5)
+        pedido = Pedido.objects.get()
+        self.assertRedirects(r, reverse("pedidos:exito", args=[pedido.pk]))
+        self.assertEqual(pedido.entrega, Pedido.Entrega.ENVIO)
 
     def test_un_cliente_no_ve_el_pedido_de_otro(self):
         self.client.force_login(self.usuario)
