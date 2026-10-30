@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'cuentas',
     'pedidos',
     'paginas',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +148,13 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
+
+# Si hay una cuenta de Cloudinary configurada, las fotos se guardan ahí.
+# En tu computadora no se define, y las fotos siguen en la carpeta media/.
+if env("CLOUDINARY_URL", default=""):
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"
+    }
 
 CSRF_TRUSTED_ORIGINS = []
 
