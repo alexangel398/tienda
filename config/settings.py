@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -138,3 +139,28 @@ NEGOCIO = {
     "horarios": env("NEGOCIO_HORARIOS", default="Lunes a viernes de 9 a 18 h"),
     "ciudad": env("NEGOCIO_CIUDAD", default="Buenos Aires"),
 }
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
+
+CSRF_TRUSTED_ORIGINS = []
+
+# Render informa su dirección pública en esta variable de entorno.
+RENDER_HOST = env("RENDER_EXTERNAL_HOSTNAME", default="")
+if RENDER_HOST:
+    ALLOWED_HOSTS.append(RENDER_HOST)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_HOST}")
+
+# Ajustes de seguridad que solo se activan fuera del modo de desarrollo.
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600
+        # HSTS para subdominios y preload se dejan apagados a propósito (ver ERS).
+    SILENCED_SYSTEM_CHECKS = ["security.W005", "security.W021"]
