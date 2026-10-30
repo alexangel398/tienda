@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 
 {% block title %}{{ producto.nombre }}{% endblock %}
-{% block description %}{{ producto.nombre }} de {{ producto.marca }} en {{ negocio.nombre }}, {{ negocio.ciudad }}.{% endblock %}
+{% block description %}
+{{ producto.nombre }} de {{ producto.marca }} en {{ negocio.nombre }}, {{ negocio.ciudad }}.
+{% endblock %}
 
 {% block content %}
 <a class="enlace-volver" href="{% url 'catalogo:listado' %}">
-    {% include "partes/icono.html" with nombre="flecha-izquierda" %}Volver a la tienda
+    {% include "partes/icono.html" with nombre="flecha-izquierda" %}Volver al catálogo
 </a>
 
 {% include "partes/producto_ficha.html" with p=producto %}
+
 {% include "partes/beneficios.html" %}
 
 {% if relacionados %}
@@ -24,5 +27,4 @@
     </div>
 </section>
 {% endif %}
-<!-- Este es el que faltaba o quedaba colgado -->
 {% endblock %}

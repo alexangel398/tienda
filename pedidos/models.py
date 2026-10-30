@@ -30,6 +30,15 @@ class Pedido(models.Model):
     class Meta:
         ordering = ["-fecha"]
 
+    @property
+    def badge_class(self):
+        return {
+            self.Estado.PENDIENTE: "estado-pendiente",
+            self.Estado.PREPARADO: "estado-preparado",
+            self.Estado.ENTREGADO: "estado-entregado",
+            self.Estado.CANCELADO: "estado-cancelado",
+        }.get(self.estado, "estado-pendiente")
+
     def __str__(self):
         return f"Pedido #{self.pk}"
 

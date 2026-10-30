@@ -34,7 +34,7 @@ def listado(request):
 
 def detalle(request, pk):
     producto = get_object_or_404(
-        Producto.objects.select_related("categoria", "marca"), pk=pk
+        Producto.objects.select_related("categoria", "marca").prefetch_related("colores"), pk=pk
     )
     contexto = {"producto": producto, "relacionados": producto.relacionados()}
     return render(request, "catalogo/detalle.html", contexto)
@@ -42,6 +42,6 @@ def detalle(request, pk):
 
 def rapida(request, pk):
     producto = get_object_or_404(
-        Producto.objects.select_related("categoria", "marca"), pk=pk
+        Producto.objects.select_related("categoria", "marca").prefetch_related("colores"), pk=pk
     )
     return render(request, "partes/producto_ficha.html", {"p": producto, "rapida": True})

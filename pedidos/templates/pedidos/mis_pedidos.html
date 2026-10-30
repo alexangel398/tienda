@@ -3,34 +3,43 @@
 {% block title %}Mis pedidos{% endblock %}
 
 {% block content %}
-<h1>Mis pedidos</h1>
+<div style="max-width: 900px; margin-inline: auto;">
+    <h1 style="margin-bottom: 1.5rem;">Mis pedidos</h1>
 
-{% if pedidos %}
-<div class="tabla-scroll">
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>Pedido</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in pedidos %}
-            <tr>
-                <td><a href="{% url 'pedidos:detalle' p.pk %}">Pedido #{{ p.pk }}</a></td>
-                <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
-                <td>{{ p.get_estado_display }}</td>
-                <td>${{ p.total }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if pedidos %}
+    <div class="tabla-scroll" style="margin-bottom: 1.5rem;">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Pedido</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pedidos %}
+                <tr>
+                    <td><a href="{% url 'pedidos:detalle' p.pk %}" class="enlace-acento"
+                            style="font-weight: 600;">Pedido #{{ p.pk }}</a></td>
+                    <td class="texto-suave" style="font-size: 0.9rem;">{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <span class="badge-estado {{ p.badge_class }}">
+                            {{ p.get_estado_display }}
+                        </span>
+                    </td>
+                    <td style="text-align: right; font-weight: 600;">${{ p.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="texto-suave" style="margin-bottom: 1.5rem;">Todavía no hiciste ningún pedido.</p>
+    {% endif %}
+
+    <div>
+        <a href="{% url 'catalogo:listado' %}" class="enlace-volver-centro">← Volver al catálogo</a>
+    </div>
 </div>
-{% else %}
-<p>Todavía no hiciste ningún pedido.</p>
-{% endif %}
-
-<p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
 {% endblock %}

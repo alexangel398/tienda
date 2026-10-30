@@ -1,26 +1,27 @@
 {% extends "base.html" %}
 
 {% block title %}Ubicación y contacto{% endblock %}
-{% block description %}Cómo llegar a {{ negocio.nombre }} en {{ negocio.ciudad }}: dirección, horarios y contacto por
-WhatsApp.{% endblock %}
+{% block description %}Cómo llegar a {{ negocio.nombre }} en {{ negocio.ciudad }}: dirección y horarios de atención.{% endblock %}
 
 {% block content %}
-<h1>Ubicación y contacto</h1>
-<p><strong>Dirección:</strong> {{ negocio.direccion }}</p>
-<p><strong>Horarios:</strong> {{ negocio.horarios }}</p>
+<div style="max-width: 900px; margin-inline: auto;">
+    <h1>Ubicación y contacto</h1>
+    
+    <div style="display: grid; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <p style="margin: 0;"><strong>Dirección:</strong> {{ negocio.direccion }}</p>
+        <p style="margin: 0;"><strong>Horarios:</strong> {{ negocio.horarios }}</p>
+    </div>
 
-<div class="acciones">
-    <a class="boton" href="https://www.google.com/maps/search/?api=1&query={{ negocio.direccion|urlencode }}" target="_blank" rel="noopener">
-        Cómo llegar
-    </a>
-    <a class="boton boton-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
-        {% include "partes/icono.html" with nombre="whatsapp" %} Escribir por WhatsApp
-    </a>
-</div>
+    <div class="acciones" style="margin-bottom: 2rem;">
+        <a class="boton" href="https://www.google.com/maps/search/?api=1&query={{ negocio.direccion|urlencode }}" target="_blank" rel="noopener">
+            {% include "partes/icono.html" with nombre="flecha-derecha" %} Cómo llegar
+        </a>
+    </div>
 
-<div class="mapa">
-    <iframe title="Mapa del local"
-        src="https://maps.google.com/maps?q={{ negocio.direccion|urlencode }}&amp;output=embed" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="mapa">
+        <iframe title="Mapa del local"
+            src="https://maps.google.com/maps?q={{ negocio.direccion|urlencode }}&amp;output=embed" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade" style="width: 100%; height: 450px; border: 0; display: block;"></iframe>
+    </div>
 </div>
 {% endblock %}

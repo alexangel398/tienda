@@ -16,6 +16,17 @@
         <p class="stock{% if p.stock == 0 %} sin{% endif %}">
             {% if p.stock > 0 %}Disponible ({{ p.stock }} unidades){% else %}Sin stock{% endif %}
         </p>
+<!-- Selector de colores -->
+        {% if p.colores.all %}
+        <div style="margin: 1rem 0;">
+            <span style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.95rem; color: #374151;">Colores disponibles:</span>
+            <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                {% for color in p.colores.all %}
+                <span title="{{ color.nombre }}" style="display: inline-block; width: 34px; height: 34px; border-radius: 50%; background-color: {% if color.codigo_hex %}{{ color.codigo_hex }}{% else %}#3b82f6{% endif %}; border: 2px solid #d1d5db; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15);"></span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
         {% if p.stock > 0 %}
         <form class="ficha-compra" method="post" action="{% url 'pedidos:agregar' p.pk %}">

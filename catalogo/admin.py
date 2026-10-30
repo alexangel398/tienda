@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Categoria, Marca, Producto
+from .models import Categoria, Marca, Color, Producto
 
 STOCK_BAJO = 5
 
@@ -41,18 +41,24 @@ class MarcaAdmin(admin.ModelAdmin):
     search_fields = ["nombre"]
 
 
+@admin.register(Color)
+class ColorAdmin(admin.ModelAdmin):
+    search_fields = ["nombre"]
+
+
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
     list_display = ["miniatura", "nombre", "marca", "categoria", "precio", "stock"]
     list_display_links = ["nombre"]
     list_editable = ["precio", "stock"]
-    list_filter = ["categoria", "marca", StockFilter]
+    list_filter = ["categoria", "marca", StockFilter, "colores"]
     search_fields = ["nombre", "marca__nombre"]
-    autocomplete_fields = ["categoria", "marca"]
+    autocomplete_fields = ["categoria", "marca", "colores"]
+    raw_id_fields = ["colores"]
     list_per_page = 25
     readonly_fields = ["vista_previa"]
     fieldsets = [
-        ("Datos del producto", {"fields": ["nombre", "descripcion", "categoria", "marca"]}),
+        ("Datos del producto", {"fields": ["nombre", "descripcion", "categoria", "marca", "colores"]}),
         ("Precio y stock", {"fields": ["precio", "stock"]}),
         ("Imagen", {"fields": ["imagen", "vista_previa"]}),
     ]

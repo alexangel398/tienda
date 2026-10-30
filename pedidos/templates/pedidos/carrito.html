@@ -4,36 +4,43 @@
 
 {% block content %}
 <div class="contenedor">
-    <h1>Carrito</h1>
+    <h1 style="margin-bottom: 1.5rem;">Carrito de compras</h1>
 
     {% if items %}
-    <div class="tabla-scroll">
+    <div class="tabla-scroll" style="margin-bottom: 1.5rem;">
         <table class="tabla">
             <thead>
                 <tr>
                     <th>Producto</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Subtotal</th>
-                    <th></th>
+                    <th style="width: 120px;">Precio</th>
+                    <th style="width: 150px; text-align: center;">Cantidad</th>
+                    <th style="width: 120px; text-align: right;">Subtotal</th>
+                    <th style="width: 80px; text-align: center;"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for i in items %}
                 <tr>
-                    <td><a href="{% url 'catalogo:detalle' i.producto.pk %}">{{ i.producto.nombre }}</a></td>
-                    <td>${{ i.producto.precio }}</td>
                     <td>
-                        <form method="post" action="{% url 'pedidos:actualizar' i.producto.pk %}" class="en-linea">
+                        <a href="{% url 'catalogo:detalle' i.producto.pk %}" class="enlace-acento"
+                            style="font-weight: 600;">
+                            {{ i.producto.nombre }}
+                        </a>
+                    </td>
+                    <td class="texto-suave">${{ i.producto.precio }}</td>
+                    <td style="text-align: center;">
+                        <form method="post" action="{% url 'pedidos:actualizar' i.producto.pk %}" class="en-linea"
+                            style="justify-content: center;">
                             {% csrf_token %}
                             {% include "partes/selector_cantidad.html" with valor=i.cantidad maximo=i.producto.stock autoenviar=True %}
                         </form>
                     </td>
-                    <td>${{ i.subtotal }}</td>
-                    <td>
-                        <form method="post" action="{% url 'pedidos:quitar' i.producto.pk %}">
+                    <td style="text-align: right; font-weight: 600;">${{ i.subtotal }}</td>
+                    <td style="text-align: center;">
+                        <form method="post" action="{% url 'pedidos:quitar' i.producto.pk %}" style="margin: 0;">
                             {% csrf_token %}
-                            <button type="submit" class="boton boton-borde boton-chico">Quitar</button>
+                            <button type="submit" class="boton boton-borde boton-chico"
+                                style="color: var(--error); border-color: var(--borde);">Quitar</button>
                         </form>
                     </td>
                 </tr>
@@ -41,20 +48,27 @@
             </tbody>
         </table>
     </div>
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-        <a class="enlace-volver" href="{% url 'catalogo:listado' %}">{% include "partes/icono.html" with nombre="flecha-izquierda" %} Seguir comprando</a>
-        <div style="text-align: right;">
-            <p class="total" style="margin-bottom: 1rem;">Total: ${{ total }}</p>
+
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--borde); flex-wrap: wrap; gap: 1rem;">
+        <a class="enlace-volver" href="{% url 'catalogo:listado' %}" style="margin-bottom: 0;">
+            {% include "partes/icono.html" with nombre="flecha-izquierda" %} Seguir comprando
+        </a>
+        <div style="text-align: right; display: flex; align-items: center; gap: 1.5rem;">
+            <div>
+                <span class="texto-suave" style="font-size: 0.9rem; display: block;">Total del pedido:</span>
+                <span class="total" style="font-size: 1.5rem;">${{ total }}</span>
+            </div>
             <a class="boton" href="{% url 'pedidos:confirmar' %}">Confirmar pedido</a>
         </div>
     </div>
     {% else %}
     <div class="carrito-vacio" style="text-align: center; max-width: 480px; margin-inline: auto; padding-block: 3rem;">
-        <div class="icono-vacio" style="display: grid; place-items: center; width: 4rem; height: 4rem; margin-inline: auto; margin-bottom: 1.25rem; color: var(--texto-suave);">
+        <div class="icono-vacio"
+            style="display: grid; place-items: center; width: 4rem; height: 4rem; margin-inline: auto; margin-bottom: 1.25rem; color: var(--texto-suave);">
             {% include "partes/icono.html" with nombre="bolsa" %}
         </div>
-        
+
         <h2 style="font-size: 1.75rem; margin-bottom: .5rem;">Tu carrito está vacío</h2>
         <p class="texto-suave" style="margin-bottom: 1.5rem;">Parece que aún no has añadido nada a tu carrito.</p>
 
@@ -62,9 +76,12 @@
             <a class="boton" href="{% url 'catalogo:listado' %}">Continuar comprando</a>
         </div>
 
-        <div class="detalles-seguridad" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; font-size: .9rem; color: var(--texto-suave); border-top: 1px solid var(--borde); padding-top: 1.5rem;">
-            <span style="display: inline-flex; align-items: center; gap: .4rem;">{% include "partes/icono.html" with nombre="reloj" %} Envío rápido en Buenos Aires</span>
-            <span style="display: inline-flex; align-items: center; gap: .4rem;">{% include "partes/icono.html" with nombre="escudo" %} Pago seguro</span>
+        <div class="detalles-seguridad"
+            style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; font-size: .9rem; color: var(--texto-suave); border-top: 1px solid var(--borde); padding-top: 1.5rem;">
+            <span style="display: inline-flex; align-items: center; gap: .4rem;">
+                {% include "partes/icono.html" with nombre="reloj" %} Envío rápido en Buenos Aires</span>
+            <span style="display: inline-flex; align-items: center; gap: .4rem;">
+                {% include "partes/icono.html" with nombre="escudo" %} Pago seguro</span>
         </div>
     </div>
     {% endif %}

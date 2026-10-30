@@ -3,11 +3,21 @@
 {% block title %}Ingresar{% endblock %}
 
 {% block content %}
-<h1>Ingresar</h1>
-<form method="post" class="formulario">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Ingresar</button>
-</form>
-<p>¿No tenés cuenta? <a href="{% url 'cuentas:registro' %}">Registrate</a></p>
+<div class="seccion-centrada">
+    <h1>Ingresar</h1>
+    
+    <div class="formulario-tarjeta">
+        <form method="post" class="formulario">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="acciones-formulario">
+                <button type="submit" class="boton boton-bloque">Ingresar</button>
+            </div>
+        </form>
+    </div>
+    
+    <p style="text-align: center; margin-top: 1.5rem;">
+        ¿No tenés cuenta? <a href="{% url 'cuentas:registro' %}" class="enlace-acento">Registrate</a>
+    </p>
+</div>
 {% endblock %}

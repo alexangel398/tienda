@@ -3,35 +3,61 @@
 {% block title %}Pedido registrado{% endblock %}
 
 {% block content %}
-<h1>Pedido #{{ pedido.pk }} registrado</h1>
-<p>Estado: {{ pedido.get_estado_display }} · Entrega: {{ pedido.get_entrega_display }}</p>
+<div class="seccion-centrada">
+    <div class="formulario formulario-tarjeta">
+        <h1 style="text-align: center; margin-top: 0; font-size: 1.75rem; margin-bottom: 0.5rem;">
+            Pedido #{{ pedido.pk }} registrado</h1>
 
-<table class="tabla">
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for d in pedido.detalles.all %}
-        <tr>
-            <td>{{ d.producto.nombre }}</td>
-            <td>{{ d.cantidad }}</td>
-            <td>${{ d.subtotal }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<p class="total">Total: ${{ pedido.total }}</p>
+        <p class="texto-suave" style="text-align: center; margin-bottom: 1.5rem; font-size: 0.95rem;">
+            Estado: <strong>{{ pedido.get_estado_display }}</strong> &middot; Entrega: <strong>{{pedido.get_entrega_display }}</strong>
+        </p>
 
-<div class="acciones">
-    <a class="boton boton-whatsapp" href="{{ whatsapp_pedido_url }}" target="_blank" rel="noopener">
-        {% include "partes/icono.html" with nombre="whatsapp" %}Enviar mi pedido por WhatsApp</a>
+        <div class="resumen-pedido"
+            style="margin-bottom: 1.5rem; background: var(--fondo-suave); padding: 1rem; border-radius: var(--radio-chico); border: 1px solid var(--borde);">
+            <div class="tabla-scroll">
+                <table class="tabla" style="margin-bottom: 0.5rem;">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th style="text-align: center;">Cantidad</th>
+                            <th style="text-align: right;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in pedido.detalles.all %}
+                        <tr>
+                            <td>{{ d.producto.nombre }}</td>
+                            <td style="text-align: center;">{{ d.cantidad }}</td>
+                            <td style="text-align: right;">${{ d.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--borde);">
+                <span style="font-weight: 600;">Total:</span>
+                <span class="total" style="font-size: 1.25rem;">${{ pedido.total }}</span>
+            </div>
+        </div>
+
+        <div style="display: grid; gap: 1rem; text-align: center;">
+            <a class="boton boton-whatsapp boton-bloque" href="{{ whatsapp_pedido_url }}" target="_blank"
+                rel="noopener">
+                {% include "partes/icono.html" with nombre="whatsapp" %} Enviar mi pedido por WhatsApp
+            </a>
+
+            <p class="texto-suave" style="font-size: 0.9rem; margin: 0;">
+                Tu pedido ya quedó registrado. Enviá el mensaje para coordinar el pago y la entrega con el negocio.
+            </p>
+
+            <div
+                style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--borde);">
+                <a href="{% url 'pedidos:mis_pedidos' %}" class="enlace-acento" style="font-weight: 500;">Ver mis
+                    pedidos</a>
+                <a href="{% url 'catalogo:listado' %}" class="enlace-volver-centro">← Volver al catálogo</a>
+            </div>
+        </div>
+    </div>
 </div>
-<p class="texto-suave">Tu pedido ya quedó registrado. Enviá el mensaje para coordinar el pago y la entrega con el
-    negocio.</p>
-<p><a href="{% url 'pedidos:mis_pedidos' %}">Ver mis pedidos</a></p>
-<p><a href="{% url 'catalogo:listado' %}">← Volver al catálogo</a></p>
 {% endblock %}

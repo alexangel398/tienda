@@ -6,15 +6,35 @@
 negocio.ciudad }}.{% endblock %}
 
 {% block content %}
-<h1>Nuestra historia</h1>
+<div style="max-width: 900px; margin-inline: auto; padding-block: 1rem 3rem;">
+    <!-- Título principal -->
+    <h1 style="margin-bottom: 2rem; font-size: 2.25rem; font-weight: 700;">Nuestra historia</h1>
 
-<figure class="foto-historia">
-    <img src="{% static 'img/local.jpg' %}" alt="El local de {{ negocio.nombre }}">
-</figure>
+    <!-- Imagen principal de ancho completo y bordes prolijos -->
+    <figure class="foto-historia" style="margin: 0 0 2rem 0; overflow: hidden; border-radius: var(--radio);">
+        <img src="{% static 'img/local.jpg' %}" alt="El local de {{ negocio.nombre }}"
+            style="width: 100%; max-height: 450px; object-fit: cover; display: block;">
+    </figure>
 
-<p>Empezamos en ferias, con unos pocos productos y mucho trabajo. Con el tiempo, los clientes volvieron, nos
-    recomendaron y el negocio fue creciendo paso a paso.</p>
-<p>Hoy seguimos tratando a cada cliente igual que el primer día: conocemos bien cada producto y te ayudamos a elegir el
-    que necesitás.</p>
-<p>Gracias por visitarnos, en el local y ahora también por acá.</p>
+    <!-- Bloque de texto con excelente jerarquía y separación -->
+    <div
+        style="display: grid; gap: 1.25rem; font-size: 1.1rem; line-height: 1.75; color: var(--texto); margin-bottom: 3rem;">
+        <p style="margin: 0;">
+            Empezamos en ferias, con unos pocos productos y mucho trabajo. Con el tiempo, los clientes volvieron, nos
+            recomendaron y el negocio fue creciendo paso a paso.
+        </p>
+        <p style="margin: 0;">
+            Hoy seguimos tratando a cada cliente igual que el primer día: conocemos bien cada producto y te ayudamos a
+            elegir el que necesitás.
+        </p>
+        <p style="margin: 0; color: var(--texto-suave); font-weight: 500;">
+            Gracias por visitarnos, en el local y ahora también por acá.
+        </p>
+    </div>
+
+    <!-- Enlace para volver alineado al ancho del contenido -->
+    <div style="padding-top: 1.5rem; border-top: 1px solid var(--borde);">
+        <a href="{% url 'catalogo:listado' %}" class="enlace-volver-centro">← Volver al catálogo</a>
+    </div>
+</div>
 {% endblock %}

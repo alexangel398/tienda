@@ -21,8 +21,17 @@ class Marca(models.Model):
         ordering = ["nombre"]
 
     def __str__(self):
-        
-        
+        return self.nombre
+
+
+class Color(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+    codigo_hex = models.CharField(max_length=7, help_text="Ej: #000000 para negro")
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
         return self.nombre
 
 
@@ -42,6 +51,7 @@ class Producto(models.Model):
     marca = models.ForeignKey(
         Marca, on_delete=models.PROTECT, related_name="productos"
     )
+    colores = models.ManyToManyField(Color, blank=True, related_name="productos")
 
     class Meta:
         ordering = ["nombre"]
