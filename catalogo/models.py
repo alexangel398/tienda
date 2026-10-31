@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
+from .imagenes import optimizar_campo
 
 
 class Categoria(models.Model):
@@ -34,8 +35,17 @@ class Color(models.Model):
     def __str__(self):
         return self.nombre
 
+class ImagenOptimizadaMixin(models.Model):
+    """Optimiza el campo `imagen` cuando se sube una foto nueva."""
 
-class Producto(models.Model):
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.imagen = optimizar_campo(self.imagen)
+        super().save(*args, **kwargs)
+
+class Producto(ImagenOptimizadaMixin, models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True)
     precio = models.DecimalField(
