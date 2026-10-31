@@ -173,3 +173,4 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 3600
         # HSTS para subdominios y preload se dejan apagados a propósito (ver ERS).
     SILENCED_SYSTEM_CHECKS = ["security.W005", "security.W021"]
+    SECURE_REDIRECT_EXEMPT = [r"^health/$"]
