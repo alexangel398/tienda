@@ -1,32 +1,24 @@
 {# Requiere p (un Producto). Opcional: rapida=True dentro de la ventana de vista rápida. #}
 <article class="ficha">
-    <div class="ficha-imagen">
-        {% if p.imagen %}
-        <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
-        {% else %}
-        <span class="sin-imagen">{% include "partes/icono.html" with nombre="imagen" %}</span>
-        {% endif %}
-    </div>
+    
+    {# 1. Aquí reemplazamos tu foto principal estática por la galería completa que maneja fotos principales + adicionales en WebP #}
+    {% include "partes/galeria.html" %}
 
     <div class="ficha-info">
         <h1 class="ficha-titulo">{{ p.nombre }}</h1>
         <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
         <p class="ficha-precio">${{ p.precio }}</p>
-        {% if p.descripcion %}<p class="texto-suave">{{ p.descripcion|linebreaksbr }}</p>{% endif %}
+        
+        {% if p.descripcion %}
+        <p class="texto-suave">{{ p.descripcion|linebreaksbr }}</p>
+        {% endif %}
+
         <p class="stock{% if p.stock == 0 %} sin{% endif %}">
             {% if p.stock > 0 %}Disponible ({{ p.stock }} unidades){% else %}Sin stock{% endif %}
         </p>
-<!-- Selector de colores -->
-        {% if p.colores.all %}
-        <div style="margin: 1rem 0;">
-            <span style="display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.95rem; color: #374151;">Colores disponibles:</span>
-            <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-                {% for color in p.colores.all %}
-                <span title="{{ color.nombre }}" style="display: inline-block; width: 34px; height: 34px; border-radius: 50%; background-color: {% if color.codigo_hex %}{{ color.codigo_hex }}{% else %}#3b82f6{% endif %}; border: 2px solid #d1d5db; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15);"></span>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
+
+        {# 2. Aquí reemplazamos tu bloque anterior de colores manuales por el include que trae talles y colores juntos y prolijos #}
+        {% include "partes/variantes.html" %}
 
         {% if p.stock > 0 %}
         <form class="ficha-compra" method="post" action="{% url 'pedidos:agregar' p.pk %}">
@@ -49,7 +41,6 @@
                 {% include "partes/icono.html" with nombre="compartir" %}<span>Compartir</span>
             </button>
 
-            <!-- Agregá esta línea exacta para que el test encuentre el texto -->
             <a class="accion-texto"
                 href="https://wa.me/{{ negocio.whatsapp }}?text=Hola,%20quiero%20consultar%20por%20el%20producto:%20{{ p.nombre|urlencode }}"
                 target="_blank" rel="noopener">

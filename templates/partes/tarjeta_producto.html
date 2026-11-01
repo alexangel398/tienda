@@ -4,7 +4,7 @@
     <div class="tarjeta-imagen">
         <a href="{% url 'catalogo:detalle' p.pk %}">
             {% if p.imagen %}
-            src="{{ p.imagen.url|optimizada }}" alt="{{ p.nombre }}" loading="lazy">
+            <img src="{{ p.imagen.url|optimizada }}" alt="{{ p.nombre }}" loading="lazy">
             {% else %}
             <span class="sin-imagen">
                 {% include "partes/icono.html" with nombre="imagen" %}

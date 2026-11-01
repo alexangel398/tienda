@@ -19,6 +19,10 @@
 }
 
 /* ===== 2. Base ===== */
+html {
+    height: 100%;
+}
+
 *,
 *::before,
 *::after {
@@ -26,12 +30,15 @@
 }
 
 body {
+    min-height: 100%;
     margin: 0;
-    padding-bottom: 4.5rem;
+    display: flex;
+    flex-direction: column;
     font-family: "Inter", system-ui, sans-serif;
     line-height: 1.5;
     color: var(--texto);
     background: var(--fondo);
+    padding-bottom: 4.5rem;
 }
 
 img {
@@ -79,6 +86,7 @@ p {
 }
 
 main.contenedor {
+    flex: 1;
     padding-block: 1.5rem 3rem;
 }
 
@@ -303,24 +311,32 @@ textarea {
     text-decoration: none;
     white-space: nowrap;
     margin: 0;
-}
-
-.marca {
     order: 1;
     margin-right: auto;
 }
 
 .carrito-enlace {
     order: 2;
+    position: relative;
+    display: inline-flex;
+    padding: .4rem;
+    text-decoration: none;
 }
 
 .menu-boton {
     order: 3;
+    display: inline-flex;
+    padding: .4rem;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
 }
 
 .buscador {
     order: 4;
     flex: 1 1 100%;
+    position: relative;
 }
 
 .menu,
@@ -370,22 +386,6 @@ textarea {
     color: var(--texto-suave);
 }
 
-.menu-boton {
-    display: inline-flex;
-    padding: .4rem;
-    border: 0;
-    background: none;
-    color: inherit;
-    cursor: pointer;
-}
-
-.carrito-enlace {
-    position: relative;
-    display: inline-flex;
-    padding: .4rem;
-    text-decoration: none;
-}
-
 .contador {
     position: absolute;
     top: -2px;
@@ -399,10 +399,6 @@ textarea {
     background: var(--acento);
     font-size: .7rem;
     font-weight: 700;
-}
-
-.buscador {
-    position: relative;
 }
 
 .buscador .icono {
@@ -844,7 +840,6 @@ textarea {
     cursor: pointer;
 }
 
-
 /* ===== 13. Ficha de producto, selector, beneficios y vista rápida ===== */
 .enlace-volver {
     display: inline-flex;
@@ -870,25 +865,6 @@ textarea {
         grid-template-columns: 1fr 1fr;
         gap: 2.5rem;
     }
-}
-
-.ficha-imagen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    border: 1px solid #f3f4f6;
-    border-radius: 20px;
-    background: var(--fondo-suave);
-    box-shadow: var(--sombra-tarjeta);
-}
-
-.ficha-imagen img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
 }
 
 .ficha-titulo {
@@ -1126,34 +1102,6 @@ textarea {
     text-decoration: underline;
 }
 
-/* ===== 2. Base ===== */
-html {
-    height: 100%;
-}
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-body {
-    min-height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    font-family: "Inter", system-ui, sans-serif;
-    line-height: 1.5;
-    color: var(--texto);
-    background: var(--fondo);
-}
-
-main.contenedor {
-    flex: 1;
-    /* Esto estira el contenido principal para empujar el footer hacia abajo */
-    padding-block: 1.5rem 3rem;
-}
-
 /* ===== Estilos extra para formularios en tarjeta (Login / Registro) ===== */
 .formulario-tarjeta .formulario {
     max-width: 100%;
@@ -1199,24 +1147,168 @@ main.contenedor {
 .estado-pendiente {
     background: #fef3c7;
     color: #d97706;
-    /* Amarillo / Naranja */
 }
 
 .estado-preparado {
     background: #e0f2fe;
     color: #0284c7;
-    /* Celeste / Azul */
 }
 
 .estado-entregado {
     background: #d1fae5;
     color: #059669;
-    /* Verde */
 }
 
 .estado-cancelado {
     background: #fee2e2;
     color: #dc2626;
-    /* Rojo */
 }
 
+/* ===== 15. Visor de fotos, talles y colores ===== */
+.galeria {
+    display: grid;
+    gap: .75rem;
+    align-content: start;
+    min-width: 0;
+}
+
+.visor {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #f3f4f6;
+    border-radius: 20px;
+    background: var(--fondo-suave);
+    box-shadow: var(--sombra-tarjeta);
+    width: 100%;
+}
+
+.visor-pista {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+.visor-pista::-webkit-scrollbar {
+    display: none;
+}
+
+.visor-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1 / 1;
+    scroll-snap-align: center;
+}
+
+.visor-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.visor-flecha {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: var(--texto);
+    box-shadow: var(--sombra-suave);
+    cursor: pointer;
+    z-index: 5;
+}
+
+.visor-flecha[data-anterior] {
+    left: .75rem;
+}
+
+.visor-flecha[data-siguiente] {
+    right: .75rem;
+}
+
+.visor-flecha:disabled {
+    opacity: .35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.visor-puntos {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: .5rem;
+}
+
+.punto {
+    width: .65rem;
+    height: .65rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--borde);
+    cursor: pointer;
+}
+
+.punto.activo {
+    background: var(--acento);
+}
+
+.variante {
+    margin: 1rem 0;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: .4rem 0 0;
+    padding: 0;
+    list-style: none !important;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .25rem .8rem;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    font-size: .9rem;
+    background: var(--fondo);
+}
+.chips-colores {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+}
+
+.muestra-color {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--borde);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+.muestra {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid var(--borde);
+    border-radius: 50%;
+    display: inline-block;
+}

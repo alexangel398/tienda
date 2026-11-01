@@ -1,0 +1,42 @@
+{# Requiere p (un Producto). #}
+{% load fotos %}
+{% with lista=p.fotos %}
+<div class="galeria" data-galeria>
+    <div class="visor">
+        <div class="visor-pista" data-pista tabindex="0" aria-label="Fotos de {{ p.nombre }}">
+            {% for foto in lista %}
+            <div class="visor-slide">
+                <img src="{{ foto.url|optimizada:1080 }}" alt="{{ p.nombre }}, foto {{ forloop.counter }}" {% if not forloop.first %}loading="lazy"{% endif %}>
+            </div>
+            {% empty %}
+            <div class="visor-slide">
+                <span class="sin-imagen">
+                    {% include "partes/icono.html" with nombre="imagen" %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if lista|length > 1 %}
+        <button type="button" class="visor-flecha" data-anterior disabled aria-label="Foto anterior">
+            <span style="pointer-events: none; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                {% include "partes/icono.html" with nombre="flecha-izquierda" %}
+            </span>
+        </button>
+        <button type="button" class="visor-flecha" data-siguiente aria-label="Foto siguiente">
+            <span style="pointer-events: none; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                {% include "partes/icono.html" with nombre="flecha-derecha" %}
+            </span>
+        </button>
+        {% endif %}
+    </div>
+
+    {% if lista|length > 1 %}
+    <div class="visor-puntos">
+        {% for foto in lista %}
+        <button type="button" class="punto{% if forloop.first %} activo{% endif %}" data-punto="{{ forloop.counter0 }}" aria-label="Ver foto {{ forloop.counter }}"></button>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endwith %}

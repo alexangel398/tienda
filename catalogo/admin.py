@@ -1,7 +1,8 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Categoria, Marca, Color, Producto
+from .models import Categoria, Color, ImagenProducto, Marca, Producto, Talle
 
 STOCK_BAJO = 5
 
@@ -41,9 +42,49 @@ class MarcaAdmin(admin.ModelAdmin):
     search_fields = ["nombre"]
 
 
+class ColorForm(forms.ModelForm):
+    class Meta:
+        model = Color
+        fields = "__all__"
+        widgets = {"codigo_hex": forms.TextInput(attrs={"type": "color"})}
+
+
 @admin.register(Color)
 class ColorAdmin(admin.ModelAdmin):
+    form = ColorForm
+    list_display = ["muestra", "nombre", "codigo_hex"]
+    list_display_links = ["nombre"]
     search_fields = ["nombre"]
+
+    @admin.display(description="Color")
+    def muestra(self, obj):
+        return format_html(
+            '<span style="display:inline-block;width:1.4em;height:1.4em;'
+            'border-radius:50%;border:1px solid #ccc;background:{}"></span>',
+            obj.codigo_hex,
+        )
+
+
+@admin.register(Talle)
+class TalleAdmin(admin.ModelAdmin):
+    list_display = ["nombre", "orden"]
+    list_editable = ["orden"]
+    search_fields = ["nombre"]
+
+
+class ImagenProductoInline(admin.TabularInline):
+    model = ImagenProducto
+    extra = 2
+    fields = ["imagen", "vista", "descripcion", "orden"]
+    readonly_fields = ["vista"]
+
+    @admin.display(description="Vista previa")
+    def vista(self, obj):
+        if obj and obj.imagen:
+            return format_html(
+                '<img src="{}" style="height:60px;border-radius:4px;">', obj.imagen.url
+            )
+        return "—"
 
 
 @admin.register(Producto)
@@ -51,16 +92,18 @@ class ProductoAdmin(admin.ModelAdmin):
     list_display = ["miniatura", "nombre", "marca", "categoria", "precio", "stock"]
     list_display_links = ["nombre"]
     list_editable = ["precio", "stock"]
-    list_filter = ["categoria", "marca", StockFilter, "colores"]
+    list_filter = ["categoria", "marca", StockFilter]
     search_fields = ["nombre", "marca__nombre"]
-    autocomplete_fields = ["categoria", "marca", "colores"]
-    raw_id_fields = ["colores"]
+    autocomplete_fields = ["categoria", "marca"]
+    filter_horizontal = ["talles", "colores"]
+    inlines = [ImagenProductoInline]
     list_per_page = 25
     readonly_fields = ["vista_previa"]
     fieldsets = [
-        ("Datos del producto", {"fields": ["nombre", "descripcion", "categoria", "marca", "colores"]}),
+        ("Datos del producto", {"fields": ["nombre", "descripcion", "categoria", "marca"]}),
         ("Precio y stock", {"fields": ["precio", "stock"]}),
-        ("Imagen", {"fields": ["imagen", "vista_previa"]}),
+        ("Talles y colores disponibles", {"fields": ["talles", "colores"]}),
+        ("Foto principal", {"fields": ["imagen", "vista_previa"]}),
     ]
 
     @admin.display(description="Foto")

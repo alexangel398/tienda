@@ -31,6 +31,21 @@ class Color(models.Model):
 
     class Meta:
         ordering = ["nombre"]
+        verbose_name_plural = "colores"
+
+    def __str__(self):
+        return self.nombre
+
+class Talle(models.Model):
+    nombre = models.CharField(
+        max_length=20, unique=True, help_text="Ej: S, M, L, 42 o Talle único"
+    )
+    orden = models.PositiveSmallIntegerField(
+        default=0, help_text="Para mostrar los talles de menor a mayor"
+    )
+
+    class Meta:
+        ordering = ["orden", "nombre"]
 
     def __str__(self):
         return self.nombre
@@ -62,7 +77,7 @@ class Producto(ImagenOptimizadaMixin, models.Model):
         Marca, on_delete=models.PROTECT, related_name="productos"
     )
     colores = models.ManyToManyField(Color, blank=True, related_name="productos")
-
+    talles = models.ManyToManyField(Talle, blank=True, related_name="productos")
     class Meta:
         ordering = ["nombre"]
 
@@ -75,3 +90,28 @@ class Producto(ImagenOptimizadaMixin, models.Model):
             .exclude(pk=self.pk)
             .select_related("marca", "categoria")[:limite]
         )
+        
+    @property
+    def fotos(self):
+        """La foto principal seguida de las adicionales, para el visor."""
+        lista = [self.imagen] if self.imagen else []
+        lista += [adicional.imagen for adicional in self.imagenes.all()]
+        return lista
+
+class ImagenProducto(ImagenOptimizadaMixin, models.Model):
+    producto = models.ForeignKey(
+        Producto, on_delete=models.CASCADE, related_name="imagenes"
+    )
+    imagen = models.ImageField(upload_to="productos/")
+    descripcion = models.CharField(
+        max_length=100, blank=True, help_text="Ej: Frente, Espalda o Detalle de la tela"
+    )
+    orden = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["orden", "id"]
+        verbose_name = "imagen adicional"
+        verbose_name_plural = "imágenes adicionales"
+
+    def __str__(self):
+        return self.descripcion or f"Imagen de {self.producto}"
