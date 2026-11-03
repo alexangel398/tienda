@@ -7,10 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Inicio{% endblock %} · {{ negocio.nombre }} · {{ negocio.ciudad }}</title>
     <meta name="description"
-        content="{% block description %}{{ negocio.nombre }} en {{ negocio.ciudad }}: insumos y máquinas.{% endblock %}">
+        content="{% block description %}{{ negocio.nombre }}, {{ negocio.lema|lower }}: {{ negocio.rubro|lower }} en {{ negocio.ciudad }}.{% endblock %}">
+    <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}?v=9.9">
     <script src="{% static 'js/sitio.js' %}" defer></script>
 </head>
@@ -21,7 +22,8 @@
     <main class="contenedor">
         {% if messages %}
         <ul class="mensajes">
-            {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+            {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>
+            {% endfor %}
         </ul>
         {% endif %}
         {% block content %}{% endblock %}

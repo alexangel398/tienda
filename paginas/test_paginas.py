@@ -85,3 +85,28 @@ class PaginasTests(TestCase):
     def test_el_inicio_permite_agregar_productos_al_carrito(self):
         r = self.client.get(reverse("paginas:inicio"))
         self.assertContains(r, "Añadir al carrito")
+
+@override_settings(
+    NEGOCIO={
+        **NEGOCIO,
+        "rubro": "Ropa",
+        "lema": "Tu moda",
+        "facebook": "https://facebook.com/x",
+        "tiktok": "https://tiktok.com/@x",
+    }
+)
+class IdentidadTests(TestCase):
+    def test_el_pie_muestra_solo_las_redes_configuradas(self):
+        r = self.client.get(reverse("paginas:inicio"))
+        self.assertContains(r, "https://facebook.com/x")
+        self.assertContains(r, "https://tiktok.com/@x")
+        self.assertNotContains(r, "Instagram")
+
+    def test_el_rubro_y_el_lema_salen_de_la_configuracion(self):
+        r = self.client.get(reverse("paginas:inicio"))
+        self.assertContains(r, "Ropa en Rosario")
+        self.assertNotContains(r, "Insumos y máquinas")
+
+    def test_la_portada_muestra_el_logo(self):
+        r = self.client.get(reverse("paginas:inicio"))
+        self.assertContains(r, "portada-logo")

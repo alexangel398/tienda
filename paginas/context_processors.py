@@ -8,6 +8,8 @@ ENLACES = [
     {"texto": "Contacto", "url": "paginas:contacto"},
 ]
 
+REDES = [("Instagram", "instagram"), ("Facebook", "facebook"), ("TikTok", "tiktok")]
+
 
 def negocio(request):
     datos = settings.NEGOCIO
@@ -18,5 +20,6 @@ def negocio(request):
         "marca_inicio": inicio,
         "marca_final": final,
         "enlaces": ENLACES,
+        "redes": [{"nombre": n, "url": datos[c]} for n, c in REDES if datos.get(c)],
         "whatsapp_url": f"https://wa.me/{datos['whatsapp']}?text={mensaje}",
     }

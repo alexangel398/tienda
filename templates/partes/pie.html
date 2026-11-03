@@ -2,13 +2,19 @@
     <div class="contenedor pie-grilla">
         <div>
             <p class="marca">{% include "partes/marca.html" %}</p>
-            <p class="texto-suave">Insumos y máquinas en {{ negocio.ciudad }}.</p>
+            <p class="texto-suave">{{ negocio.lema }}. {{ negocio.rubro }} en {{ negocio.ciudad }}.</p>
             <ul class="pie-datos">
                 <li>{% include "partes/icono.html" with nombre="ubicacion" %}<span>{{ negocio.direccion }}</span></li>
-                <li>{% include "partes/icono.html" with nombre="reloj" %}<span>{{ negocio.horarios }}</span></li>
+                <li>{% if negocio.horarios %}
+                <li>{% include "partes/icono.html" with nombre="reloj" %}<span>{{ negocio.horarios }}</span></li>{%endif %}</span></li>
                 <li>{% include "partes/icono.html" with nombre="mensaje" %}<a href="{{ whatsapp_url }}" target="_blank"
                         rel="noopener">Escribinos por WhatsApp</a></li>
             </ul>
+            {% if redes %}
+            <ul class="redes">
+                {% for r in redes %}<li><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.nombre }}</a></li>{%endfor %}
+            </ul>
+            {% endif %}
         </div>
 
         <div>

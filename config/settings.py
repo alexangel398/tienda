@@ -127,26 +127,35 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 LOGIN_URL = "cuentas:login"
 LOGIN_REDIRECT_URL = "catalogo:listado"
 LOGOUT_REDIRECT_URL = "catalogo:listado"
 
 NEGOCIO = {
-    "nombre": env("NEGOCIO_NOMBRE", default="Insumos y Máquinas"),
-    "whatsapp": env("NEGOCIO_WHATSAPP", default="5491163633835"),
-    "direccion": env("NEGOCIO_DIRECCION", default="Av. Ejemplo 1234, Buenos Aires"),
-    "horarios": env("NEGOCIO_HORARIOS", default="Lunes a viernes de 9 a 18 h"),
-    "ciudad": env("NEGOCIO_CIUDAD", default="Buenos Aires"),
+    "nombre": env("NEGOCIO_NOMBRE", default="Zairux"),
+    "lema": env("NEGOCIO_LEMA", default="Tu moda"),
+    "rubro": env("NEGOCIO_RUBRO", default="Ropa y moda"),
+    "ciudad": env("NEGOCIO_CIUDAD", default="La Salada"),
+    "direccion": env("NEGOCIO_DIRECCION", default="La Salada, Ocean, Puesto 132, Pasillo 6"),
+    "horarios": env("NEGOCIO_HORARIOS", default=""),
+    "whatsapp": env("NEGOCIO_WHATSAPP", default="5491100000000"),
+    "tiktok": env("NEGOCIO_TIKTOK", default="https://www.tiktok.com/@zairux.tu.moda"),
+    "facebook": env("NEGOCIO_FACEBOOK", default="https://www.facebook.com/Zairux.tu.moda"),
+    "instagram": env("NEGOCIO_INSTAGRAM", default=""),
 }
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
 }
 
 # Si hay una cuenta de Cloudinary configurada, las fotos se guardan ahí.

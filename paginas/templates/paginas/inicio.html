@@ -1,13 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Inicio{% endblock %}
-{% block description %}{{ negocio.nombre }} en {{ negocio.ciudad }}: insumos y máquinas. Mirá el catálogo y hacé tu
-pedido.{% endblock %}
+{% block description %}{{ negocio.nombre }}, {{ negocio.lema|lower }}: {{ negocio.rubro|lower }} en {{ negocio.ciudad
+}}. Mirá el catálogo y hacé tu pedido.{% endblock %}
 
 {% block content %}
 <section class="portada">
-    <h1>{% include "partes/marca.html" %}</h1>
-    <p>Insumos y máquinas en {{ negocio.ciudad }}. Elegí tus productos y coordinamos el pedido.</p>
+    <img class="portada-logo" src="{% static 'img/logo.png' %}" alt="" width="176" height="176">
+    <h1 class="solo-lector">{{ negocio.nombre }}, {{ negocio.lema|lower }}</h1>
+    <p>{{ negocio.rubro }} elegí tus prendas y coordinamos el pedido</p>
     <div class="acciones">
         <a class="boton" href="{% url 'catalogo:listado' %}">Ver catálogo</a>
         <a class="boton boton-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">

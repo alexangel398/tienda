@@ -1,3 +1,4 @@
+from django.conf import settings
 from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
@@ -6,9 +7,9 @@ from .models import Categoria, Color, ImagenProducto, Marca, Producto, Talle
 
 STOCK_BAJO = 5
 
-admin.site.site_header = "Panel de la tienda"
-admin.site.site_title = "Panel de la tienda"
-admin.site.index_title = "Gestión del catálogo y los pedidos"
+admin.site.site_header = f"Panel de {settings.NEGOCIO['nombre']}"
+admin.site.site_title = f"Panel de {settings.NEGOCIO['nombre']}"
+admin.site.index_title = "Gestión del catálogo y pedidos"
 
 
 class StockFilter(admin.SimpleListFilter):
