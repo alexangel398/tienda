@@ -107,3 +107,40 @@ class TextilTests(ArchivosTemporalesTestCase):
         nombres = [f.name for f in producto.fotos]
         self.assertTrue(nombres[0].startswith("productos/principal"))
         self.assertTrue(nombres[1].startswith("productos/espalda"))
+        
+    def asignar(self, *nombres):
+        self.remera.talles.set(Talle.objects.filter(nombre__in=nombres))
+
+    def test_los_talles_numericos_se_cargan_y_salen_en_orden(self):
+        nombres = list(
+            Talle.objects.filter(nombre__in=["10", "2", "1"]).values_list("nombre", flat=True)
+        )
+        self.assertEqual(nombres, ["1", "2", "10"])
+
+    def test_el_minimo_de_compra_es_la_cantidad_de_talles(self):
+        self.assertEqual(self.remera.minimo_compra, 1)
+        self.asignar("2", "3", "4", "5")
+        self.assertEqual(self.remera.minimo_compra, 4)
+        self.asignar("1", "2", "3", "4", "5")
+        self.assertEqual(self.remera.minimo_compra, 5)
+
+    def test_el_precio_de_la_curva_es_el_precio_por_el_minimo(self):
+        self.asignar("1", "2", "3", "4", "5")
+        self.assertEqual(self.remera.precio_curva, 25000)
+
+    def test_la_ficha_muestra_la_curva_y_el_selector_arranca_en_el_minimo(self):
+        self.asignar("2", "3", "4", "5")
+        r = self.client.get(self.url)
+        self.assertContains(r, "Curva de 4 unidades")
+        self.assertContains(r, 'value="4" min="4"')
+
+    def test_la_tarjeta_agrega_la_curva_completa(self):
+        self.asignar("2", "3", "4", "5")
+        r = self.client.get(reverse("catalogo:listado"))
+        self.assertContains(r, 'name="cantidad" value="4"')
+
+    def test_si_el_stock_no_alcanza_para_una_curva_no_se_puede_comprar(self):
+        self.asignar("1", "2", "3", "4", "5")  # curva de 5, stock de 4
+        r = self.client.get(self.url)
+        self.assertContains(r, "no alcanza")
+        self.assertNotContains(r, "Comprar ahora")

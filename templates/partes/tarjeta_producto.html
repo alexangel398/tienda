@@ -13,10 +13,10 @@
         </a>
 
         {% if minima %}
-        {% if p.stock > 0 %}
+        {% if p.stock >= p.minimo_compra %}
         <form class="agregar-rapido" method="post" action="{% url 'pedidos:agregar' p.pk %}">
             {% csrf_token %}
-            <input type="hidden" name="cantidad" value="1">
+            <input type="hidden" name="cantidad" value="{{ p.minimo_compra }}">
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
             <button type="submit" aria-label="Añadir {{ p.nombre }} al carrito">
                 {% include "partes/icono.html" with nombre="bolsa" %}
@@ -36,13 +36,14 @@
         <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
         {% endif %}
         <p class="precio">${{ p.precio }}</p>
+        {% if not minima %}<p class="texto-suave">Precio por mayor{% if p.minimo_compra > 1 %} · curva de {{ p.minimo_compra }} u.{% endif %}</p>{% endif %}
 
         {% if not minima %}
         <div class="tarjeta-accion">
-            {% if p.stock > 0 %}
+            {% if p.stock >= p.minimo_compra %}
             <form method="post" action="{% url 'pedidos:agregar' p.pk %}">
                 {% csrf_token %}
-                <input type="hidden" name="cantidad" value="1">
+                <input type="hidden" name="cantidad" value="{{ p.minimo_compra }}">
                 <input type="hidden" name="next" value="{{ request.get_full_path }}">
                 <button class="boton boton-bloque" type="submit">
                     {% include "partes/icono.html" with nombre="carrito" %} Añadir al carrito

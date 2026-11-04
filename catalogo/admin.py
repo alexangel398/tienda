@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.conf import settings
 from django import forms
 from django.contrib import admin
@@ -90,7 +92,7 @@ class ImagenProductoInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ["miniatura", "nombre", "marca", "categoria", "precio", "stock"]
+    list_display = ["miniatura", "nombre", "marca", "categoria", "precio", "stock", "curva"]
     list_display_links = ["nombre"]
     list_editable = ["precio", "stock"]
     list_filter = ["categoria", "marca", StockFilter]
@@ -103,7 +105,10 @@ class ProductoAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Datos del producto", {"fields": ["nombre", "descripcion", "categoria", "marca"]}),
         ("Precio y stock", {"fields": ["precio", "stock"]}),
-        ("Talles y colores disponibles", {"fields": ["talles", "colores"]}),
+        ("Talles y colores disponibles", {
+            "fields": ["talles", "colores"],
+            "description": "Los talles que elijas definen la curva: el cliente compra como mínimo una unidad de cada talle. Ejemplo: talles 2 al 5 = curva de 4.",
+        }),
         ("Foto principal", {"fields": ["imagen", "vista_previa"]}),
     ]
 
@@ -122,3 +127,10 @@ class ProductoAdmin(admin.ModelAdmin):
                 '<img src="{}" style="height:120px;border-radius:4px;">', obj.imagen.url
             )
         return "—"
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("talles")
+
+    @admin.display(description="Curva (mín.)")
+    def curva(self, obj):
+        return obj.minimo_compra

@@ -517,7 +517,7 @@ textarea {
     border-top: 1px solid var(--borde);
     font-size: 0.9rem;
     color: var(--texto-suave);
-    
+
 }
 
 @media (min-width: 700px) {
@@ -1344,4 +1344,17 @@ textarea {
 .pie .redes a {
     font-weight: 500;
     color: var(--acento-oscuro);
+}
+
+.ficha-precio-nota {
+    font-size: .9rem;
+    font-weight: 400;
+    color: var(--texto-suave);
+}
+
+.curva {
+    margin: 0 0 1rem;
+    padding: .6rem .9rem;
+    border-radius: var(--radio-chico);
+    background: var(--acento-suave);
 }

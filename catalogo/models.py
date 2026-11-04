@@ -89,6 +89,7 @@ class Producto(ImagenOptimizadaMixin, models.Model):
             Producto.objects.filter(categoria_id=self.categoria_id)
             .exclude(pk=self.pk)
             .select_related("marca", "categoria")[:limite]
+            .prefetch_related("talles")
         )
         
     @property
@@ -97,6 +98,15 @@ class Producto(ImagenOptimizadaMixin, models.Model):
         lista = [self.imagen] if self.imagen else []
         lista += [adicional.imagen for adicional in self.imagenes.all()]
         return lista
+    
+    @property
+    def minimo_compra(self):
+        """Una curva: una unidad de cada talle. Sin talles, se vende de a una."""
+        return max(len(self.talles.all()), 1)
+
+    @property
+    def precio_curva(self):
+        return self.precio * self.minimo_compra
 
 class ImagenProducto(ImagenOptimizadaMixin, models.Model):
     producto = models.ForeignKey(
