@@ -22,7 +22,7 @@ class DetallePedidoInline(admin.TabularInline):
     model = DetallePedido
     extra = 0
     can_delete = False
-    readonly_fields = ["producto", "cantidad", "precio_unitario"]
+    readonly_fields = ["producto", "color", "talles", "cantidad", "precio_unitario"]
 
     def has_add_permission(self, request, obj=None):
         return False

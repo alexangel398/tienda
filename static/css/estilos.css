@@ -1358,3 +1358,40 @@ textarea {
     border-radius: var(--radio-chico);
     background: var(--acento-suave);
 }
+
+.elegir-color {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.elegir-color legend {
+    padding: 0;
+}
+
+.chip-opcion {
+    position: relative;
+    cursor: pointer;
+}
+
+.chip-opcion input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chip-opcion:has(input:checked) {
+    border-color: var(--acento);
+    background: var(--acento-suave);
+}
+
+.chip-opcion:has(input:focus-visible) {
+    outline: 2px solid var(--acento);
+    outline-offset: 2px;
+}
+
+.nota-minimo {
+    display: block;
+    font-size: .85rem;
+}
+

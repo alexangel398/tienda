@@ -52,7 +52,8 @@ class DetallePedido(models.Model):
     )
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-
+    color = models.CharField(max_length=50, blank=True, default="")
+    talles = models.CharField(max_length=100, blank=True, default="")    
     @property
     def subtotal(self):
         return self.precio_unitario * self.cantidad

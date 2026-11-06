@@ -11,7 +11,7 @@ def listado(request):
     marca_id = _a_entero(request.GET.get("marca"))
     q = request.GET.get("q", "").strip()
 
-    productos = Producto.objects.select_related("categoria", "marca").prefetch_related("talles")
+    productos = Producto.objects.select_related("categoria", "marca").prefetch_related("talles", "colores")
     if categoria_id:
         productos = productos.filter(categoria_id=categoria_id)
     if marca_id:

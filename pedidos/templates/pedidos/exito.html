@@ -26,7 +26,11 @@
                     <tbody>
                         {% for d in pedido.detalles.all %}
                         <tr>
-                            <td>{{ d.producto.nombre }}</td>
+                            <td>
+                                {{ d.producto.nombre }}
+                                {% if d.color %}<span class="texto-suave"> · {{ d.color }}</span>{% endif %}
+                                {% if d.talles %}<span class="texto-suave nota-minimo">Talles {{ d.talles }}</span>{% endif %}
+                            </td>
                             <td style="text-align: center;">{{ d.cantidad }}</td>
                             <td style="text-align: right;">${{ d.subtotal }}</td>
                         </tr>

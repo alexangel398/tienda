@@ -8,7 +8,7 @@
         <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
         <p class="ficha-precio">${{ p.precio }} <span class="ficha-precio-nota">por unidad · precio por mayor</span></p>
         {% if p.minimo_compra > 1 %}
-        <p class="curva">Curva de {{ p.minimo_compra }} unidades (una de cada talle): <strong>${{ p.precio_curva }}</strong></p>
+        <p class="curva">Curva de {{ p.minimo_compra }} unidades (una de cada talle): <strong>${{ p.precio_curva}}</strong></p>
         {% endif %}
 
         {% if p.descripcion %}
@@ -25,8 +25,26 @@
         <form class="ficha-compra" method="post" action="{% url 'pedidos:agregar' p.pk %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+            {% if p.colores.all %}
+            <fieldset class="elegir-color">
+                <legend class="etiqueta">Color</legend>
+                <div class="chips">
+                    {% for c in p.colores.all %}
+                    <label class="chip chip-opcion">
+                        <input type="radio" name="color" value="{{ c.pk }}" required>
+                        <span class="muestra" style="--color-muestra: {{ c.codigo_hex }}; background-color: var(--color-muestra);"></span>
+                        {{ c.nombre }}
+                    </label>
+                    {% endfor %}
+                </div>
+                {% if p.minimo_compra > 1 %}<p class="texto-suave nota-minimo">Cada color se compra por curva completa
+                    ({{ p.minimo_compra }} unidades como mínimo).</p>{% endif %}
+            </fieldset>
+            {% endif %}
+
             <span class="etiqueta">Cantidad</span>
-            {% include "partes/selector_cantidad.html" with valor=p.minimo_compra minimo=p.minimo_compra maximo=p.stock %}
+            {% include "partes/selector_cantidad.html" with valor=p.minimo_compra minimo=p.minimo_compra maximo=p.stock%}
             <div class="acciones">
                 <button class="boton" type="submit">
                     {% include "partes/icono.html" with nombre="carrito" %}Añadir al carrito

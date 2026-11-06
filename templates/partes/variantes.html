@@ -10,13 +10,3 @@
 </div>
 {% endif %}
 
-{% if p.colores.all %}
-<div class="variante">
-    <span class="etiqueta">Colores disponibles</span>
-    <div class="chips-colores">
-        {% for c in p.colores.all %}
-        <span class="muestra-color" title="{{ c.nombre }}" style="background-color: {{ c.codigo_hex }};"></span>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}

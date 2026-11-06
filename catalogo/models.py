@@ -89,7 +89,7 @@ class Producto(ImagenOptimizadaMixin, models.Model):
             Producto.objects.filter(categoria_id=self.categoria_id)
             .exclude(pk=self.pk)
             .select_related("marca", "categoria")[:limite]
-            .prefetch_related("talles")
+            .prefetch_related("talles", "colores")[:4]
         )
         
     @property

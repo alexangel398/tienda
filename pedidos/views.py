@@ -4,15 +4,19 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.conf import settings
-from catalogo.models import Producto
+from catalogo.models import Color, Producto
 
 from .forms import PedidoForm
 from .models import Pedido
-from .services import Carrito, StockInsuficiente, crear_pedido, mensaje_pedido, url_whatsapp
+from .services import Carrito, StockInsuficiente, crear_pedido, mensaje_pedido, url_whatsapp, CarritoInvalido
 
 def _cantidad(request, defecto=1):
     valor = request.POST.get("cantidad", "")
     return int(valor) if valor.isdigit() else defecto
+
+def _color(request):
+    valor = request.POST.get("color", "")
+    return Color.objects.filter(pk=int(valor)).first() if valor.isdigit() else None
 
 def _volver(request, defecto="pedidos:carrito"):
     destino = request.POST.get("next", "")
@@ -32,27 +36,30 @@ def ver_carrito(request):
 @require_POST
 def agregar(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
+    carrito = Carrito(request)
     cantidad = max(_cantidad(request), 1)
-    if Carrito(request).agregar(producto, cantidad):
+    if carrito.agregar(producto, cantidad, _color(request)):
         if request.POST.get("comprar_ahora"):
             return redirect("pedidos:confirmar")
         messages.success(request, f"{producto.nombre} se agregó al carrito.")
     else:
-        messages.error(request, f"No hay stock suficiente de {producto.nombre}.")
+        messages.error(request, carrito.error)
     return _volver(request)
 
 
 @require_POST
 def actualizar(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
-    if not Carrito(request).actualizar(producto, _cantidad(request, 0)):
-        messages.error(request, f"No hay stock suficiente de {producto.nombre}.")
+    carrito = Carrito(request)
+    if not carrito.actualizar(producto, _cantidad(request, 0), _color(request)):
+        messages.error(request, carrito.error)
     return redirect("pedidos:carrito")
 
 
 @require_POST
 def quitar(request, pk):
-    Carrito(request).quitar(pk)
+    color = _color(request)
+    Carrito(request).quitar(pk, color.pk if color else None)
     return redirect("pedidos:carrito")
 
 
@@ -68,7 +75,7 @@ def confirmar(request):
         if form.is_valid():
             try:
                 pedido = crear_pedido(carrito, request.user, form.cleaned_data)
-            except StockInsuficiente as error:
+            except (StockInsuficiente) as error:
                 messages.error(
                     request,
                     "No hay stock suficiente de: "
@@ -76,6 +83,10 @@ def confirmar(request):
                     + ". Ajustá las cantidades.",
                 )
                 return redirect("pedidos:carrito")
+            except CarritoInvalido as error:
+                messages.error(request, " ".join(error.problemas))
+                return redirect("pedidos:carrito")
+            
             return redirect("pedidos:exito", pk=pedido.pk)
     else:
         form = PedidoForm()

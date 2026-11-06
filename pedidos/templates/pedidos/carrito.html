@@ -26,19 +26,27 @@
                             style="font-weight: 600;">
                             {{ i.producto.nombre }}
                         </a>
+                        {% if i.color %}
+                        <span class="texto-suave"> · {{ i.color.nombre }}</span>
+                        {% endif %}
+                        {% if i.minimo > 1 %}
+                        <span class="texto-suave nota-minimo">Mínimo {{ i.minimo }} u.</span>
+                        {% endif %}
                     </td>
                     <td class="texto-suave">${{ i.producto.precio }}</td>
                     <td style="text-align: center;">
                         <form method="post" action="{% url 'pedidos:actualizar' i.producto.pk %}" class="en-linea"
                             style="justify-content: center;">
                             {% csrf_token %}
-                            {% include "partes/selector_cantidad.html" with valor=i.cantidad maximo=i.producto.stock autoenviar=True %}
+                            <input type="hidden" name="color" value="{{ i.color_id|default:'' }}">
+                            {% include "partes/selector_cantidad.html" with valor=i.cantidad minimo=i.minimo maximo=i.maximo autoenviar=True %}
                         </form>
                     </td>
                     <td style="text-align: right; font-weight: 600;">${{ i.subtotal }}</td>
                     <td style="text-align: center;">
                         <form method="post" action="{% url 'pedidos:quitar' i.producto.pk %}" style="margin: 0;">
                             {% csrf_token %}
+                            <input type="hidden" name="color" value="{{ i.color_id|default:'' }}">
                             <button type="submit" class="boton boton-borde boton-chico"
                                 style="color: var(--error); border-color: var(--borde);">Quitar</button>
                         </form>

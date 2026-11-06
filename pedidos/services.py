@@ -1,47 +1,104 @@
 import re
-from urllib.parse import quote
-from django.conf import settings
+from collections import defaultdict
 from decimal import Decimal
+from urllib.parse import quote
+
+from django.conf import settings
 from django.db import transaction
-from catalogo.models import Producto
-from .models import DetallePedido, Pedido
 from django.db.models import F
+
+from catalogo.models import Color, Producto
+
+from .models import DetallePedido, Pedido
 
 CLAVE_SESION = "carrito"
 
 
+def revisar_linea(producto, color, cantidad):
+    """Reglas de venta de una línea (modelo + color). Devuelve el motivo del rechazo o ''."""
+    colores = list(producto.colores.all())
+    if colores and color is None:
+        return f"Elegí un color para {producto.nombre}."
+    if color is not None and color not in colores:
+        return f"{producto.nombre} no está disponible en ese color."
+    minimo = producto.minimo_compra
+    if cantidad < minimo:
+        por_color = " por color" if colores else ""
+        return f"{producto.nombre} se vende desde {minimo} unidades{por_color} (una curva completa)."
+    return ""
+
+
 class Carrito:
-    """Carrito guardado en la sesión: {id_producto: cantidad}."""
+    """Carrito guardado en la sesión: {clave: cantidad}.
+
+    La clave es el id del producto, o "producto:color" si se eligió un color.
+    Cada color es una línea aparte y necesita su propia curva completa (una unidad
+    por talle). Encima de ese mínimo se puede sumar de a una unidad. El stock es uno
+    solo por modelo y se reparte entre sus colores.
+    """
 
     def __init__(self, request):
         self.session = request.session
         self.items = self.session.get(CLAVE_SESION, {})
+        self.error = ""
+
+    @staticmethod
+    def _clave(producto_id, color_id=None):
+        return f"{producto_id}:{color_id}" if color_id else str(producto_id)
+
+    @staticmethod
+    def _separar(clave):
+        producto_id, _, color_id = clave.partition(":")
+        return int(producto_id), (int(color_id) if color_id else None)
+
+    def _unidades_de(self, producto_id, excepto=None):
+        return sum(
+            cantidad
+            for clave, cantidad in self.items.items()
+            if clave != excepto and self._separar(clave)[0] == producto_id
+        )
+
+    def _motivo_de_rechazo(self, producto, color, cantidad):
+        motivo = revisar_linea(producto, color, cantidad)
+        if motivo:
+            return motivo
+        clave = self._clave(producto.pk, color.pk if color else None)
+        if cantidad + self._unidades_de(producto.pk, excepto=clave) > producto.stock:
+            return f"No hay stock suficiente de {producto.nombre}."
+        return ""
 
     def _guardar(self):
         self.session[CLAVE_SESION] = self.items
         self.session.modified = True
 
-    def agregar(self, producto, cantidad=1):
-        clave = str(producto.pk)
+    def _rechazar(self, motivo):
+        self.error = motivo
+        return False
+
+    def agregar(self, producto, cantidad=1, color=None):
+        clave = self._clave(producto.pk, color.pk if color else None)
         nueva = self.items.get(clave, 0) + cantidad
-        if nueva > producto.stock:
-            return False
+        motivo = self._motivo_de_rechazo(producto, color, nueva)
+        if motivo:
+            return self._rechazar(motivo)
         self.items[clave] = nueva
         self._guardar()
         return True
 
-    def actualizar(self, producto, cantidad):
+    def actualizar(self, producto, cantidad, color=None):
+        color_id = color.pk if color else None
         if cantidad <= 0:
-            self.quitar(producto.pk)
+            self.quitar(producto.pk, color_id)
             return True
-        if cantidad > producto.stock:
-            return False
-        self.items[str(producto.pk)] = cantidad
+        motivo = self._motivo_de_rechazo(producto, color, cantidad)
+        if motivo:
+            return self._rechazar(motivo)
+        self.items[self._clave(producto.pk, color_id)] = cantidad
         self._guardar()
         return True
 
-    def quitar(self, producto_id):
-        self.items.pop(str(producto_id), None)
+    def quitar(self, producto_id, color_id=None):
+        self.items.pop(self._clave(producto_id, color_id), None)
         self._guardar()
 
     def vaciar(self):
@@ -49,14 +106,24 @@ class Carrito:
         self._guardar()
 
     def __iter__(self):
-        productos = Producto.objects.in_bulk([int(i) for i in self.items])
+        pares = [self._separar(clave) for clave in self.items]
+        productos = Producto.objects.prefetch_related("talles", "colores").in_bulk(
+            {producto_id for producto_id, _ in pares}
+        )
+        colores = Color.objects.in_bulk({color_id for _, color_id in pares if color_id})
         for clave, cantidad in self.items.items():
-            producto = productos.get(int(clave))
+            producto_id, color_id = self._separar(clave)
+            producto = productos.get(producto_id)
             if producto is None:
                 continue
+            otras = self._unidades_de(producto_id, excepto=clave)
             yield {
                 "producto": producto,
+                "color": colores.get(color_id),
+                "color_id": color_id,
                 "cantidad": cantidad,
+                "minimo": producto.minimo_compra,
+                "maximo": max(producto.stock - otras, 0),
                 "subtotal": producto.precio * cantidad,
             }
 
@@ -66,12 +133,18 @@ class Carrito:
     @property
     def total(self):
         return sum((item["subtotal"] for item in self), Decimal("0"))
-    
-    
+
+
 class StockInsuficiente(Exception):
     def __init__(self, productos):
         self.productos = productos
         super().__init__("Stock insuficiente")
+
+
+class CarritoInvalido(Exception):
+    def __init__(self, problemas):
+        self.problemas = problemas
+        super().__init__("; ".join(problemas))
 
 
 def crear_pedido(carrito, cliente, datos):
@@ -83,16 +156,32 @@ def crear_pedido(carrito, cliente, datos):
         ids = [item["producto"].pk for item in items]
         productos = {
             p.pk: p
-            for p in Producto.objects.select_for_update().filter(pk__in=ids).order_by("pk")
+            for p in Producto.objects.select_for_update()
+            .prefetch_related("talles", "colores")
+            .filter(pk__in=ids)
+            .order_by("pk")
         }
 
+        # Se revisa todo de nuevo con los datos bloqueados: los talles, los colores
+        # y el stock pudieron cambiar desde que se armó el carrito.
+        pedidas = defaultdict(int)
+        problemas = []
+        for item in items:
+            producto = productos[item["producto"].pk]
+            pedidas[producto.pk] += item["cantidad"]
+            motivo = revisar_linea(producto, item["color"], item["cantidad"])
+            if motivo:
+                problemas.append(motivo)
+
         faltantes = [
-            productos[item["producto"].pk].nombre
-            for item in items
-            if item["cantidad"] > productos[item["producto"].pk].stock
+            productos[pk].nombre
+            for pk, cantidad in pedidas.items()
+            if cantidad > productos[pk].stock
         ]
         if faltantes:
             raise StockInsuficiente(faltantes)
+        if problemas:
+            raise CarritoInvalido(problemas)
 
         pedido = Pedido.objects.create(
             cliente=cliente,
@@ -108,6 +197,8 @@ def crear_pedido(carrito, cliente, datos):
                 producto=producto,
                 cantidad=item["cantidad"],
                 precio_unitario=producto.precio,
+                color=item["color"].nombre if item["color"] else "",
+                talles=", ".join(t.nombre for t in producto.talles.all()),
             )
             producto.stock -= item["cantidad"]
             producto.save(update_fields=["stock"])
@@ -163,12 +254,13 @@ def url_whatsapp(numero, mensaje):
 def mensaje_pedido(pedido):
     lineas = [f"Hola, hice el pedido #{pedido.pk} en {settings.NEGOCIO['nombre']}:", ""]
     for d in pedido.detalles.select_related("producto"):
-        lineas.append(f"- {d.cantidad} x {d.producto.nombre} (${d.subtotal:.2f})")
-    lineas += [
-        "",
-        f"Total: ${pedido.total:.2f}",
-        f"Entrega: {pedido.get_entrega_display()}",
-    ]
+        partes = [f"{d.cantidad} x {d.producto.nombre}"]
+        if d.color:
+            partes.append(d.color)
+        if d.talles:
+            partes.append(f"talles {d.talles}")
+        lineas.append(f"- {' · '.join(partes)} (${d.subtotal:.2f})")
+    lineas += ["", f"Total: ${pedido.total:.2f}", f"Entrega: {pedido.get_entrega_display()}"]
     if pedido.entrega == Pedido.Entrega.ENVIO:
         lineas.append("Dirección: a coordinar por este chat")
     lineas += [f"Teléfono: {pedido.telefono}", f"Cliente: {pedido.cliente.get_username()}"]

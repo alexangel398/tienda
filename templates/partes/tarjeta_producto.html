@@ -1,54 +1,57 @@
-{% load fotos %}
 {# Requiere p (un Producto). Opcional: minima=True para la versión de productos relacionados. #}
+{% load fotos %}
+{% with con_colores=p.colores.all %}
 <article class="tarjeta{% if minima %} tarjeta-minima{% endif %}">
     <div class="tarjeta-imagen">
         <a href="{% url 'catalogo:detalle' p.pk %}">
             {% if p.imagen %}
             <img src="{{ p.imagen.url|optimizada }}" alt="{{ p.nombre }}" loading="lazy">
             {% else %}
-            <span class="sin-imagen">
-                {% include "partes/icono.html" with nombre="imagen" %}
-            </span>
+            <span class="sin-imagen">{% include "partes/icono.html" with nombre="imagen" %}</span>
             {% endif %}
         </a>
 
         {% if minima %}
-        {% if p.stock >= p.minimo_compra %}
-        <form class="agregar-rapido" method="post" action="{% url 'pedidos:agregar' p.pk %}">
-            {% csrf_token %}
-            <input type="hidden" name="cantidad" value="{{ p.minimo_compra }}">
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" aria-label="Añadir {{ p.nombre }} al carrito">
-                {% include "partes/icono.html" with nombre="bolsa" %}
-            </button>
-        </form>
-        {% endif %}
+            {% if p.stock >= p.minimo_compra %}
+                {% if con_colores %}
+                <form class="agregar-rapido" method="get" action="{% url 'catalogo:detalle' p.pk %}">
+                    <button type="submit" aria-label="Elegir color de {{ p.nombre }}">{% include "partes/icono.html" with nombre="bolsa" %}</button>
+                </form>
+                {% else %}
+                <form class="agregar-rapido" method="post" action="{% url 'pedidos:agregar' p.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="cantidad" value="{{ p.minimo_compra }}">
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" aria-label="Añadir {{ p.nombre }} al carrito">{% include "partes/icono.html" with nombre="bolsa" %}</button>
+                </form>
+                {% endif %}
+            {% endif %}
         {% else %}
         <button type="button" class="vista-rapida" data-vista-rapida="{% url 'catalogo:rapida' p.pk %}">
-            {% include "partes/icono.html" with nombre="ojo" %} Vista rápida
-        </button>
+            {% include "partes/icono.html" with nombre="ojo" %} Vista rápida</button>
         {% endif %}
     </div>
 
     <div class="tarjeta-cuerpo">
         <h3><a href="{% url 'catalogo:detalle' p.pk %}">{{ p.nombre }}</a></h3>
-        {% if not minima %}
-        <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
-        {% endif %}
+        {% if not minima %}<p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>{% endif %}
         <p class="precio">${{ p.precio }}</p>
-        {% if not minima %}<p class="texto-suave">Precio por mayor{% if p.minimo_compra > 1 %} · curva de {{ p.minimo_compra }} u.{% endif %}</p>{% endif %}
 
+        
         {% if not minima %}
+        <p class="texto-suave">Precio por mayor{% if p.minimo_compra > 1 %} · curva de {{ p.minimo_compra }} u.{% endif %}</p>
         <div class="tarjeta-accion">
             {% if p.stock >= p.minimo_compra %}
-            <form method="post" action="{% url 'pedidos:agregar' p.pk %}">
-                {% csrf_token %}
-                <input type="hidden" name="cantidad" value="{{ p.minimo_compra }}">
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                <button class="boton boton-bloque" type="submit">
-                    {% include "partes/icono.html" with nombre="carrito" %} Añadir al carrito
-                </button>
-            </form>
+                {% if con_colores %}
+                <a class="boton boton-bloque" href="{% url 'catalogo:detalle' p.pk %}">Elegir color</a>
+                {% else %}
+                <form method="post" action="{% url 'pedidos:agregar' p.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="cantidad" value="{{ p.minimo_compra }}">
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button class="boton boton-bloque" type="submit">{% include "partes/icono.html" with nombre="carrito" %} Añadir al carrito</button>
+                </form>
+                {% endif %}
             {% else %}
             <button class="boton boton-bloque" type="button" disabled>Sin stock</button>
             {% endif %}
@@ -56,3 +59,4 @@
         {% endif %}
     </div>
 </article>
+{% endwith %}

@@ -13,7 +13,7 @@ def salud(request):
 def inicio(request):
     destacados = (
         Producto.objects.filter(stock__gt=0)
-        .prefetch_related("talles")
+        .prefetch_related("talles", "colores")
         .select_related("marca")
         .order_by("-id")[:6]
     )
