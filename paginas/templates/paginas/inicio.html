@@ -8,7 +8,8 @@
 <section class="portada">
     <img class="portada-logo" src="{% static 'img/logo.png' %}" alt="" width="176" height="176">
     <h1 class="solo-lector">{{ negocio.nombre }}, {{ negocio.lema|lower }}</h1>
-    <p>{{ negocio.rubro }} elegí tus prendas y coordinamos el pedido</p>
+    <p>{{ negocio.rubro }} elegí tus prendas y coordinamos tu pedido</p>
+    
     <div class="acciones">
         <a class="boton" href="{% url 'catalogo:listado' %}">Ver catálogo</a>
         <a class="boton boton-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
