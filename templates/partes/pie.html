@@ -2,17 +2,41 @@
     <div class="contenedor pie-grilla">
         <div>
             <p class="marca">{% include "partes/marca.html" %}</p>
-            <p class="texto-suave">{{ negocio.lema }}. {{ negocio.rubro }} en {{ negocio.ciudad }}.</p>
+            
             <ul class="pie-datos">
                 <li>{% include "partes/icono.html" with nombre="ubicacion" %}<span>{{ negocio.direccion }}</span></li>
-                <li>{% if negocio.horarios %}
-                <li>{% include "partes/icono.html" with nombre="reloj" %}<span>{{ negocio.horarios }}</span></li>{%endif %}</span></li>
-                <li>{% include "partes/icono.html" with nombre="mensaje" %}<a href="{{ whatsapp_url }}" target="_blank"
-                        rel="noopener">Escribinos por WhatsApp</a></li>
+                
+                {% if negocio.horarios %}
+                <li>
+                    {% include "partes/icono.html" with nombre="reloj" %}
+                    <span>{{ negocio.horarios }}</span>
+                </li>
+                {% endif %}
+
+                <li>
+                    {% include "partes/icono.html" with nombre="mensaje" %}
+                    <a href="{{ whatsapp_url }}" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
+                </li>
             </ul>
+
             {% if redes %}
             <ul class="redes">
-                {% for r in redes %}<li><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.nombre }}</a></li>{%endfor %}
+                {% for r in redes %}
+                    {% with nombre_lower=r.nombre|lower %}
+                        {% if "facebook" in nombre_lower or "tiktok" in nombre_lower %}
+                        <li>
+                            <a href="{{ r.url }}" target="_blank" rel="noopener">
+                                {% if "facebook" in nombre_lower %}
+                                    {% include "partes/icono.html" with nombre="facebook" %}
+                                {% elif "tiktok" in nombre_lower %}
+                                    {% include "partes/icono.html" with nombre="tiktok" %}
+                                {% endif %}
+                                <span>{{ r.nombre }}</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
             </ul>
             {% endif %}
         </div>

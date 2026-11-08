@@ -6,9 +6,10 @@
     <div class="ficha-info">
         <h1 class="ficha-titulo">{{ p.nombre }}</h1>
         <p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>
-        <p class="ficha-precio">${{ p.precio }} <span class="ficha-precio-nota">por unidad · precio por mayor</span></p>
+        <p class="ficha-precio">{{ p.precio|floatformat:2 }} ARS <span class="ficha-precio-nota">precio por mayor</span></p>
         {% if p.minimo_compra > 1 %}
-        <p class="curva">Curva de {{ p.minimo_compra }} unidades (una de cada talle): <strong>${{ p.precio_curva}}</strong></p>
+        <p class="curva">Curva de {{ p.minimo_compra }} unidades (una de cada talle):
+            <strong>${{p.precio_curva}}</strong></p>
         {% endif %}
 
         {% if p.descripcion %}
@@ -27,27 +28,28 @@
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
 
             {% if p.colores.all %}
-            <fieldset class="elegir-color">
-                <legend class="etiqueta">Color</legend>
-                <div class="chips">
+            <fieldset class="colores" data-colores data-minimo="{{ p.minimo_compra }}">
+                <legend class="etiqueta">Colores <span class="texto-suave" data-colores-elegidos></span>
+                </legend>
+                <div class="bolitas">
                     {% for c in p.colores.all %}
-                    <label class="chip chip-opcion">
-                        <input type="radio" name="color" value="{{ c.pk }}" required>
-                        <span class="muestra" style="--color-muestra: {{ c.codigo_hex }}; background-color: var(--color-muestra);"></span>
-                        {{ c.nombre }}
+                    <label class="bolita" title="{{ c.nombre }}">
+                        <input type="checkbox" name="colores" value="{{ c.pk }}" aria-label="{{ c.nombre }}">
+                        <span class="bolita-color" style="--color-bolita: {{ c.codigo_hex }}; background-color: var(--color-bolita);"></span>
                     </label>
                     {% endfor %}
                 </div>
-                {% if p.minimo_compra > 1 %}<p class="texto-suave nota-minimo">Cada color se compra por curva completa
-                    ({{ p.minimo_compra }} unidades como mínimo).</p>{% endif %}
+                
             </fieldset>
             {% endif %}
 
-            <span class="etiqueta">Cantidad</span>
-            {% include "partes/selector_cantidad.html" with valor=p.minimo_compra minimo=p.minimo_compra maximo=p.stock%}
+            <span class="etiqueta">Cantidad{% if p.minimo_compra > 1 %} <span class="texto-suave">(mínimo {{p.minimo_compra }})</span>{% endif %}</span>{% include "partes/selector_cantidad.html" with valor=p.minimo_compra minimo=p.minimo_compra maximo=p.stock%}
+
+            {% if p.colores.all %}
+            
+            {% endif %}
             <div class="acciones">
-                <button class="boton" type="submit">
-                    {% include "partes/icono.html" with nombre="carrito" %}Añadir al carrito
+                <button class="boton" type="submit">{% include "partes/icono.html" with nombre="carrito"%}Añadir al carrito
                 </button>
                 <button class="boton boton-borde" type="submit" name="comprar_ahora" value="1">Comprar ahora</button>
             </div>
@@ -64,8 +66,7 @@
 
             <a class="accion-texto"
                 href="https://wa.me/{{ negocio.whatsapp }}?text=Hola,%20quiero%20consultar%20por%20el%20producto:%20{{ p.nombre|urlencode }}"
-                target="_blank" rel="noopener">
-                {% include "partes/icono.html" with nombre="whatsapp" %}<span>Consultar por este producto</span>
+                target="_blank" rel="noopener">{% include "partes/icono.html" with nombre="whatsapp" %}<span>Consultar por este producto</span>
             </a>
 
             {% if rapida %}

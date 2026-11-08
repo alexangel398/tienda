@@ -4,11 +4,11 @@ from django.conf import settings
 
 ENLACES = [
     {"texto": "Catálogo", "url": "catalogo:listado"},
-    {"texto": "Nuestra historia", "url": "paginas:historia"},
+    
     {"texto": "Contacto", "url": "paginas:contacto"},
 ]
 
-REDES = [("Instagram", "instagram"), ("Facebook", "facebook"), ("TikTok", "tiktok")]
+REDES = [ ("Facebook", "facebook"), ("TikTok", "tiktok")]
 
 
 def negocio(request):

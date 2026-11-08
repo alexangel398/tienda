@@ -10,10 +10,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Los campos con data-autoenviar envían su formulario al cambiar.
-    document.addEventListener("change", (e) => {
-        if (e.target.matches("[data-autoenviar]")) e.target.form.submit();
-    });
+// Colores: muestra los elegidos, ajusta el mínimo y reduce la cantidad al destildar si es mayor al mínimo.
+    const ajustarColores = (grupo) => {
+        const elegidos = [...grupo.querySelectorAll("input:checked")];
+        const nombres = elegidos.map((c) => c.closest(".bolita").title);
+        grupo.querySelector("[data-colores-elegidos]").textContent = nombres.length
+            ? `(${nombres.join(", ")})`
+            : "(opcional)";
+        
+        const campo = grupo.closest("form").querySelector('input[name="cantidad"]');
+        const minimoModelo = Number(grupo.dataset.minimo);
+        const maximo = campo.max ? Number(campo.max) : Infinity;
+        
+        // El nuevo mínimo permitido depende de cuántos colores tildes (o el mínimo del modelo)
+        const nuevoMinimo = Math.min(Math.max(minimoModelo, elegidos.length), maximo);
+        campo.min = nuevoMinimo;
+
+        // Si la cantidad actual es menor al mínimo requerido, la subimos
+        if (Number(campo.value) < nuevoMinimo) {
+            campo.value = nuevoMinimo;
+        } 
+        // Si destildas colores y la cantidad actual quedó más alta que el nuevo mínimo 
+        // (y supera el mínimo base del modelo), la bajamos automáticamente para acompañar.
+        else if (Number(campo.value) > nuevoMinimo && Number(campo.value) > minimoModelo) {
+            campo.value = Math.max(minimoModelo, elegidos.length);
+        }
+    };
 
     // Galería: actualiza puntos y estado de las flechas
     const actualizarGaleria = (pista) => {
@@ -21,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!galeria) return;
         const slides = pista.querySelectorAll(".visor-slide");
         if (slides.length === 0) return;
-        
+
         const anchoSlide = slides[0].clientWidth;
         const actual = Math.round(pista.scrollLeft / anchoSlide);
 
@@ -83,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
             destino = Math.max(0, Math.min(destino, slides.length - 1));
 
             pista.scrollTo({ left: destino * anchoSlide, behavior: "smooth" });
-            
+
             // Actualizar visualmente de inmediato
             setTimeout(() => actualizarGaleria(pista), 250);
             return;

@@ -339,30 +339,71 @@ textarea {
     position: relative;
 }
 
+/* ===== Menú desplegable dinámico y flotante (Responsive / Móvil) ===== */
+
+/* Contenedor principal de la cuenta / opciones de usuario */
 .menu,
 .cuenta {
-    order: 5;
-    flex-basis: 100%;
+    position: relative;
+    /* Clave para que el cartel flotante se posicione respecto a este botón */
     display: none;
+    /* Por defecto oculto en móvil hasta que se abra */
     flex-direction: column;
-    gap: .25rem;
+    gap: 0.5rem;
 }
 
+/* Cuando se abre el menú, se transforma en un cartel flotante tipo tarjeta */
 .menu-abierto .menu,
 .menu-abierto .cuenta {
     display: flex;
 }
 
-.menu a,
-.cuenta a {
-    padding: .4rem 0;
-    font-weight: 500;
-    text-decoration: none;
+/* Si quieres que la cuenta o el menú floten como un cartel elegante en celulares: */
+@media (max-width: 899px) {
+
+    .menu-abierto .cuenta,
+    .menu-abierto .menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        /* Se pega justo debajo de la barra */
+        right: 0.5rem;
+        /* Se alinea contra el margen derecho */
+        z-index: 100;
+        background: var(--fondo);
+        border: 1px solid var(--borde);
+        border-radius: var(--radio);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 0.75rem 1rem;
+        min-width: 180px;
+        animation: aparecerModal 0.2s ease-in-out;
+    }
+
+    /* Estilo limpio para los links dentro del cartel flotante */
+    .cuenta a,
+    .menu a {
+        padding: 0.4rem 0.5rem;
+        border-radius: var(--radio-chico);
+        transition: background 0.15s;
+        display: block;
+    }
+
+    .cuenta a:hover,
+    .menu a:hover {
+        background: var(--fondo-suave);
+    }
 }
 
-.menu a:hover,
-.cuenta a:not(.boton):hover {
-    color: var(--acento-oscuro);
+/* Animación sutil de aparición */
+@keyframes aparecerModal {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .cuenta {
@@ -419,43 +460,66 @@ textarea {
 
 @media (min-width: 900px) {
     .menu-boton {
-        display: none;
+        display: none !important;
     }
 
+    .cabecera-fila {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 1.5rem !important;
+        flex-wrap: nowrap !important;
+    }
+
+    /* 1. Logo obligado a la extrema izquierda */
     .marca {
-        order: 1;
-        margin-right: 0;
+        order: 1 !important;
+        margin: 0 !important;
+        flex-shrink: 0;
     }
 
+    /* 2. Menú de navegación principal al lado del logo */
+    .menu {
+        order: 2 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 1.5rem !important;
+        border-top: none !important;
+        padding-top: 0 !important;
+        flex-basis: auto !important;
+        flex-shrink: 0;
+        margin: 0 !important;
+    }
+
+    /* 3. Buscador en el centro (ocupa el espacio flexible) */
     .buscador {
-        order: 2;
-        flex: 1 1 auto;
-        max-width: 520px;
-        margin-inline: auto;
+        order: 3 !important;
+        flex: 1 !important;
+        max-width: 380px !important;
+        margin: 0 !important;
+    }
+
+    /* 4. Carrito y cuenta juntos a la extrema derecha */
+    .cabecera-derecha {
+        order: 4 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 1.25rem !important;
+        flex-shrink: 0;
+        margin: 0 !important;
     }
 
     .carrito-enlace {
-        order: 3;
+        order: initial !important;
     }
 
     .cuenta {
-        order: 4;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        flex-basis: auto;
-        gap: 1rem;
-    }
-
-    .menu {
-        order: 5;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        flex-basis: 100%;
-        gap: 2rem;
-        padding-top: .5rem;
-        border-top: 1px solid var(--borde);
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-basis: auto !important;
+        gap: 0.75rem !important;
+        margin: 0 !important;
     }
 }
 
@@ -517,7 +581,6 @@ textarea {
     border-top: 1px solid var(--borde);
     font-size: 0.9rem;
     color: var(--texto-suave);
-
 }
 
 @media (min-width: 700px) {
@@ -1359,39 +1422,289 @@ textarea {
     background: var(--acento-suave);
 }
 
-.elegir-color {
-    margin: 0;
-    padding: 0;
-    border: 0;
-}
-
-.elegir-color legend {
-    padding: 0;
-}
-
-.chip-opcion {
-    position: relative;
-    cursor: pointer;
-}
-
-.chip-opcion input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.chip-opcion:has(input:checked) {
-    border-color: var(--acento);
-    background: var(--acento-suave);
-}
-
-.chip-opcion:has(input:focus-visible) {
-    outline: 2px solid var(--acento);
-    outline-offset: 2px;
-}
-
 .nota-minimo {
     display: block;
     font-size: .85rem;
 }
 
+.aviso-curva {
+    margin: 0 0 .75rem;
+    padding: .6rem .9rem;
+    border: 1px solid var(--acento);
+    border-radius: var(--radio-chico);
+    background: var(--acento-suave);
+}
+
+.boton[aria-disabled="true"] {
+    background: var(--borde);
+    border-color: var(--borde);
+    color: var(--texto-suave);
+    pointer-events: none;
+}
+
+.colores {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.colores legend {
+    padding: 0;
+}
+
+.bolitas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-top: .5rem;
+}
+
+.bolita {
+    position: relative;
+    cursor: pointer;
+}
+
+.bolita input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.bolita-color {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid var(--borde);
+    border-radius: 50%;
+    color: #fff;
+    text-shadow: 0 0 3px rgba(0, 0, 0, .8);
+    transition: transform .15s, box-shadow .15s;
+}
+
+.bolita:hover .bolita-color {
+    transform: scale(1.08);
+}
+
+.bolita input:checked+.bolita-color {
+    box-shadow: 0 0 0 3px var(--fondo), 0 0 0 5px var(--acento);
+}
+
+.bolita input:checked+.bolita-color::after {
+    content: "✓";
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.bolita input:focus-visible+.bolita-color {
+    outline: 2px solid var(--acento);
+    outline-offset: 4px;
+}
+
+/* ===== Ajustes responsive para alinear carrito y menú a la derecha ===== */
+@media (max-width: 899px) {
+    .cabecera-fila {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        position: relative;
+    }
+
+    /* Agrupamos carrito, cuenta y botón de menú a la derecha */
+    .cabecera-derecha {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+        /* Empuja todo el bloque hacia la extrema derecha */
+        order: 2;
+    }
+
+    /* El logo queda a la izquierda */
+    .marca {
+        order: 1;
+        margin-right: auto;
+    }
+
+    /* El buscador baja a su propia línea abajo del logo y los iconos */
+    .buscador {
+        order: 3;
+        flex: 1 1 100%;
+        width: 100%;
+        margin-top: 0.25rem;
+    }
+
+    /* Limpiamos órdenes viejos que venían por defecto */
+    .carrito-enlace,
+    .menu-boton {
+        order: initial;
+    }
+}
+
+/* ===== Limpieza de subrayados en enlaces de navegación ===== */
+.menu a,
+.menu-navegacion a,
+.cuenta a,
+.cuenta-opciones a {
+    text-decoration: none !important;
+}
+
+.menu a:hover,
+.menu-navegacion a:hover,
+.cuenta a:hover,
+.cuenta-opciones a:hover {
+    text-decoration: none !important;
+}
+
+/* ===== Comportamiento Responsive para Celulares (< 900px) ===== */
+@media (max-width: 899px) {
+    .cabecera-fila {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+        position: relative;
+    }
+
+    .marca {
+        order: 1;
+        margin-right: auto;
+    }
+
+    /* Reducimos el buscador a un botón/lupa minimalista en móvil para que no ocupe toda la pantalla */
+    .buscador {
+        order: 2;
+        flex: none;
+        width: 40px;
+        height: 40px;
+        overflow: hidden;
+        transition: width 0.3s ease;
+        background: transparent;
+        border-radius: none;
+        /* Se ve como un botón circular prolijo */
+        border: none;
+        display: grid;
+        place-items: center;
+    }
+
+    /* Al hacer foco o tocar la lupa, se expande para buscar cómodamente */
+    .buscador:focus-within {
+        width: 180px;
+        border-radius: 999px;
+    }
+
+    .buscador input {
+        width: 100%;
+        padding-left: 2.2rem;
+        border: none;
+        background: transparent;
+    }
+
+    .cabecera-derecha {
+        order: 3;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    /* Ocultamos el menú desplegable por defecto */
+    .menu-desplegable {
+        display: none;
+        flex-direction: column;
+    }
+
+    /* Al abrir el menú hamburguesa, aparece la tarjeta flotante con TODAS las secciones */
+    .menu-abierto .menu-desplegable {
+        position: absolute !important;
+        top: calc(100% + 12px) !important;
+        right: 0 !important;
+        left: auto !important;
+        z-index: 1000 !important;
+        background: var(--fondo) !important;
+        border: 1px solid var(--borde) !important;
+        border-radius: var(--radio) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18) !important;
+        padding: 1rem 1.25rem !important;
+        min-width: 220px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        animation: aparecerModal 0.2s ease-in-out;
+    }
+
+    .menu-navegacion {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--borde);
+    }
+
+    .cuenta-opciones {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .menu-desplegable a,
+    .cuenta-opciones a {
+        padding: 0.45rem 0.6rem;
+        border-radius: var(--radio-chico);
+        transition: background 0.15s;
+        display: block;
+        text-decoration: none !important;
+    }
+
+    .menu-desplegable a:hover,
+    .cuenta-opciones a:hover {
+        background: var(--fondo-suave);
+    }
+}
+
+/* ===== Versión Escritorio (>= 900px) Mantiene su fila horizontal limpia ===== */
+@media (min-width: 900px) {
+    .menu-boton {
+        display: none !important;
+    }
+
+    .menu-desplegable {
+        display: contents !important;
+    }
+
+    .menu-navegacion {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 1.5rem !important;
+        order: 2 !important;
+    }
+
+    .cuenta-opciones {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        order: 4 !important;
+    }
+
+    .buscador {
+        order: 3 !important;
+        flex: 1 !important;
+        max-width: 380px !important;
+        margin: 0 !important;
+    }
+}
+
+@keyframes aparecerModal {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

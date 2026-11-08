@@ -35,7 +35,7 @@
     <div class="tarjeta-cuerpo">
         <h3><a href="{% url 'catalogo:detalle' p.pk %}">{{ p.nombre }}</a></h3>
         {% if not minima %}<p class="texto-suave">{{ p.marca }} · {{ p.categoria }}</p>{% endif %}
-        <p class="precio">${{ p.precio }}</p>
+        <p class="precio">{{ p.precio|floatformat:2 }} ARS</p>
 
         
         {% if not minima %}

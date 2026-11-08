@@ -12,29 +12,33 @@ from catalogo.models import Color, Producto
 from .models import DetallePedido, Pedido
 
 CLAVE_SESION = "carrito"
+COLOR_A_COORDINAR = "Color a coordinar"
 
 
-def revisar_linea(producto, color, cantidad):
-    """Reglas de venta de una línea (modelo + color). Devuelve el motivo del rechazo o ''."""
-    colores = list(producto.colores.all())
-    if colores and color is None:
-        return f"Elegí un color para {producto.nombre}."
-    if color is not None and color not in colores:
-        return f"{producto.nombre} no está disponible en ese color."
+def aviso_de_curva(producto, total):
+    """Aviso si el total de un modelo no llega a una curva completa."""
     minimo = producto.minimo_compra
-    if cantidad < minimo:
-        por_color = " por color" if colores else ""
-        return f"{producto.nombre} se vende desde {minimo} unidades{por_color} (una curva completa)."
-    return ""
+    if total >= minimo:
+        return ""
+    return (
+        f"{producto.nombre} se vende desde {minimo} unidades en total "
+        f"(una curva completa): te faltan {minimo - total}."
+    )
 
-
+def repartir(total, colores):
+    """Reparte `total` unidades en partes iguales entre los colores elegidos.
+    El resto va a los primeros. Sin colores, todo queda sin color (clave None)."""
+    if not colores:
+        return {None: total}
+    base, resto = divmod(total, len(colores))
+    return {color: base + (1 if i < resto else 0) for i, color in enumerate(colores)}
 class Carrito:
     """Carrito guardado en la sesión: {clave: cantidad}.
 
     La clave es el id del producto, o "producto:color" si se eligió un color.
-    Cada color es una línea aparte y necesita su propia curva completa (una unidad
-    por talle). Encima de ese mínimo se puede sumar de a una unidad. El stock es uno
-    solo por modelo y se reparte entre sus colores.
+    Un modelo puede repartirse en varios colores (y en "sin color", a coordinar
+    con el vendedor). La curva, una unidad por talle, se exige sobre el TOTAL del
+    modelo, y el stock también es uno solo por modelo.
     """
 
     def __init__(self, request):
@@ -57,16 +61,7 @@ class Carrito:
             for clave, cantidad in self.items.items()
             if clave != excepto and self._separar(clave)[0] == producto_id
         )
-
-    def _motivo_de_rechazo(self, producto, color, cantidad):
-        motivo = revisar_linea(producto, color, cantidad)
-        if motivo:
-            return motivo
-        clave = self._clave(producto.pk, color.pk if color else None)
-        if cantidad + self._unidades_de(producto.pk, excepto=clave) > producto.stock:
-            return f"No hay stock suficiente de {producto.nombre}."
-        return ""
-
+        
     def _guardar(self):
         self.session[CLAVE_SESION] = self.items
         self.session.modified = True
@@ -75,25 +70,50 @@ class Carrito:
         self.error = motivo
         return False
 
-    def agregar(self, producto, cantidad=1, color=None):
-        clave = self._clave(producto.pk, color.pk if color else None)
-        nueva = self.items.get(clave, 0) + cantidad
-        motivo = self._motivo_de_rechazo(producto, color, nueva)
+    def agregar_varios(self, producto, cantidades):
+        """cantidades: {color o None: unidades}. Se valida el modelo completo."""
+        cantidades = {color: n for color, n in cantidades.items() if n > 0}
+        if not cantidades:
+            return self._rechazar("Elegí cuántas unidades querés.")
+        disponibles = list(producto.colores.all())
+        for color in cantidades:
+            if color is not None and color not in disponibles:
+                return self._rechazar(f"{producto.nombre} no está disponible en ese color.")
+        total = self._unidades_de(producto.pk) + sum(cantidades.values())
+        motivo = aviso_de_curva(producto, total)
         if motivo:
             return self._rechazar(motivo)
-        self.items[clave] = nueva
+        if total > producto.stock:
+            return self._rechazar(f"No hay stock suficiente de {producto.nombre}.")
+        for color, n in cantidades.items():
+            clave = self._clave(producto.pk, color.pk if color else None)
+            self.items[clave] = self.items.get(clave, 0) + n
         self._guardar()
         return True
+    
+    def agregar_repartido(self, producto, total, colores):
+        """Agrega `total` unidades repartidas entre los colores tildados en la ficha."""
+        if total <= 0:
+            return self._rechazar("Elegí cuántas unidades querés.")
+        if len(colores) > total:
+            return self._rechazar(
+                f"Elegiste {len(colores)} colores y {total} unidades: "
+                "subí la cantidad o sacá algún color."
+            )
+        return self.agregar_varios(producto, repartir(total, colores))
+
+    def agregar(self, producto, cantidad=1, color=None):
+        return self.agregar_varios(producto, {color: cantidad})
 
     def actualizar(self, producto, cantidad, color=None):
         color_id = color.pk if color else None
         if cantidad <= 0:
             self.quitar(producto.pk, color_id)
             return True
-        motivo = self._motivo_de_rechazo(producto, color, cantidad)
-        if motivo:
-            return self._rechazar(motivo)
-        self.items[self._clave(producto.pk, color_id)] = cantidad
+        clave = self._clave(producto.pk, color_id)
+        if cantidad + self._unidades_de(producto.pk, excepto=clave) > producto.stock:
+            return self._rechazar(f"No hay stock suficiente de {producto.nombre}.")
+        self.items[clave] = cantidad
         self._guardar()
         return True
 
@@ -104,6 +124,19 @@ class Carrito:
     def vaciar(self):
         self.items = {}
         self._guardar()
+
+    def problemas(self):
+        """Avisos de los modelos del carrito que no llegan a una curva completa."""
+        totales = defaultdict(int)
+        for clave, cantidad in self.items.items():
+            totales[self._separar(clave)[0]] += cantidad
+        productos = Producto.objects.prefetch_related("talles").in_bulk(totales)
+        avisos = (
+            aviso_de_curva(productos[pk], total)
+            for pk, total in totales.items()
+            if pk in productos
+        )
+        return [aviso for aviso in avisos if aviso]
 
     def __iter__(self):
         pares = [self._separar(clave) for clave in self.items]
@@ -169,9 +202,12 @@ def crear_pedido(carrito, cliente, datos):
         for item in items:
             producto = productos[item["producto"].pk]
             pedidas[producto.pk] += item["cantidad"]
-            motivo = revisar_linea(producto, item["color"], item["cantidad"])
-            if motivo:
-                problemas.append(motivo)
+            if item["color"] is not None and item["color"] not in producto.colores.all():
+                problemas.append(f"{producto.nombre} no está disponible en ese color.")
+        for pk, total in pedidas.items():
+            aviso = aviso_de_curva(productos[pk], total)
+            if aviso:
+                problemas.append(aviso)
 
         faltantes = [
             productos[pk].nombre
@@ -192,12 +228,16 @@ def crear_pedido(carrito, cliente, datos):
         total = Decimal("0")
         for item in items:
             producto = productos[item["producto"].pk]
+            if item["color"]:
+                color = item["color"].nombre
+            else:
+                color = COLOR_A_COORDINAR if producto.colores.all() else ""
             DetallePedido.objects.create(
                 pedido=pedido,
                 producto=producto,
                 cantidad=item["cantidad"],
                 precio_unitario=producto.precio,
-                color=item["color"].nombre if item["color"] else "",
+                color=color,
                 talles=", ".join(t.nombre for t in producto.talles.all()),
             )
             producto.stock -= item["cantidad"]

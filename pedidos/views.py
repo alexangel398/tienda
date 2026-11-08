@@ -10,9 +10,10 @@ from .forms import PedidoForm
 from .models import Pedido
 from .services import Carrito, StockInsuficiente, crear_pedido, mensaje_pedido, url_whatsapp, CarritoInvalido
 
-def _cantidad(request, defecto=1):
-    valor = request.POST.get("cantidad", "")
-    return int(valor) if valor.isdigit() else defecto
+def _colores(request):
+    """Colores tildados en la ficha, sin repetir y ordenados por nombre."""
+    ids = {int(v) for v in request.POST.getlist("colores") if v.isdigit()}
+    return list(Color.objects.filter(pk__in=ids))
 
 def _color(request):
     valor = request.POST.get("color", "")
@@ -29,16 +30,21 @@ def _volver(request, defecto="pedidos:carrito"):
 
 def ver_carrito(request):
     carrito = Carrito(request)
-    contexto = {"items": list(carrito), "total": carrito.total}
+    contexto = {
+        "items": list(carrito),
+        "total": carrito.total,
+        "problemas": carrito.problemas(),
+    }
     return render(request, "pedidos/carrito.html", contexto)
 
 
 @require_POST
 def agregar(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
+    producto = get_object_or_404(
+        Producto.objects.prefetch_related("talles", "colores"), pk=pk
+    )
     carrito = Carrito(request)
-    cantidad = max(_cantidad(request), 1)
-    if carrito.agregar(producto, cantidad, _color(request)):
+    if carrito.agregar_repartido(producto, _cantidad(request, 0), _colores(request)):
         if request.POST.get("comprar_ahora"):
             return redirect("pedidos:confirmar")
         messages.success(request, f"{producto.nombre} se agregó al carrito.")
@@ -68,6 +74,11 @@ def confirmar(request):
     carrito = Carrito(request)
     if len(carrito) == 0:
         messages.error(request, "El carrito está vacío.")
+        return redirect("pedidos:carrito")
+    
+    problemas = carrito.problemas()
+    if problemas:
+        messages.error(request, " ".join(problemas))
         return redirect("pedidos:carrito")
 
     if request.method == "POST":
@@ -117,3 +128,8 @@ def detalle(request, pk):
         cliente=request.user,
     )
     return render(request, "pedidos/detalle.html", {"pedido": pedido})
+
+def _cantidad(request, defecto=1):
+    """Obtiene la cantidad general (sin color) desde el POST."""
+    valor = request.POST.get("cantidad", "")
+    return int(valor) if valor.isdigit() else defecto

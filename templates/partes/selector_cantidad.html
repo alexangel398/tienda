@@ -1,9 +1,11 @@
 {# Parámetros: valor, maximo. Opcionales: minimo (por defecto 1) y autoenviar. #}
 <div class="selector" data-selector>
     <button type="button" class="selector-boton" data-cantidad-menos aria-label="Restar una unidad">
-        {% include "partes/icono.html" with nombre="menos" %}</button>
+        {% include "partes/icono.html" with nombre="menos" %}
+    </button>
     <input type="number" name="cantidad" value="{{ valor }}" min="{{ minimo|default:1 }}" max="{{ maximo }}"
         aria-label="Cantidad" {% if autoenviar %} data-autoenviar{% endif %}>
     <button type="button" class="selector-boton" data-cantidad-mas aria-label="Sumar una unidad">
-        {% include "partes/icono.html" with nombre="mas" %}</button>
+        {% include "partes/icono.html" with nombre="mas" %}
+    </button>
 </div>

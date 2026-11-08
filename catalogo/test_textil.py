@@ -46,7 +46,7 @@ class TextilTests(ArchivosTemporalesTestCase):
         self.assertContains(r, "Talles disponibles")
         self.assertContains(r, ">M</li>")
         self.assertContains(r, ">L</li>")
-        self.assertContains(r, 'name="color"')
+        self.assertContains(r, 'name="colores"')
         self.assertContains(r, "#000000")
 
     def test_las_fotos_adicionales_se_optimizan_y_aparecen_en_la_galeria(self):

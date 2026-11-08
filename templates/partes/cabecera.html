@@ -1,39 +1,48 @@
 <header class="cabecera">
     <div class="contenedor cabecera-fila">
+        <!-- 1. Logo a la izquierda -->
         <a class="marca" href="{% url 'paginas:inicio' %}">{% include "partes/marca.html" %}</a>
 
-        <nav class="menu" id="menu-principal" aria-label="Principal">
-            {% for e in enlaces %}<a href="{% url e.url %}">{{ e.texto }}</a>{% endfor %}
-        </nav>
-
+        <!-- 2. Buscador (en PC se ve normal, en móvil se compacta o se oculta elegantemente) -->
         <form class="buscador" action="{% url 'catalogo:listado' %}" method="get" role="search">
             {% include "partes/icono.html" with nombre="buscar" %}
             <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar productos..."
                 aria-label="Buscar productos">
         </form>
 
-        <a class="carrito-enlace" href="{% url 'pedidos:carrito' %}" aria-label="Carrito">
-            {% include "partes/icono.html" with nombre="carrito" %}
-            {% if carrito_cantidad %}<span class="contador">{{ carrito_cantidad }}</span>{% endif %}
-        </a>
+        <!-- 3. Acciones de la derecha (Carrito y Botón Hamburguesa) -->
+        <div class="cabecera-derecha">
+            <a class="carrito-enlace" href="{% url 'pedidos:carrito' %}" aria-label="Carrito">
+                {% include "partes/icono.html" with nombre="carrito" %}
+                {% if carrito_cantidad %}<span class="contador">{{ carrito_cantidad }}</span>{% endif %}
+            </a>
 
-        <div class="cuenta">
-            {% if user.is_authenticated %}
-            <span class="saludo">Hola, {{ user.username }}</span>
-            <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>
-            <form method="post" action="{% url 'cuentas:logout' %}">
-                {% csrf_token %}
-                <button type="submit">Salir</button>
-            </form>
-            {% else %}
-            <a href="{% url 'cuentas:login' %}">Iniciar sesión</a>
-            <a class="boton boton-chico" href="{% url 'cuentas:registro' %}">Regístrate</a>
-            {% endif %}
+            <!-- Botón menú hamburguesa -->
+            <button class="menu-boton" type="button" data-menu-boton aria-expanded="false" aria-controls="menu-desplegable"
+                aria-label="Abrir menú">
+                {% include "partes/icono.html" with nombre="menu" %}
+            </button>
         </div>
 
-        <button class="menu-boton" type="button" data-menu-boton aria-expanded="false" aria-controls="menu-principal"
-            aria-label="Abrir menú">
-            {% include "partes/icono.html" with nombre="menu" %}
-        </button>
+        <!-- 4. Panel desplegable unificado (Aquí vive TODO en móvil) -->
+        <div class="menu-desplegable" id="menu-desplegable">
+            <nav class="menu-navegacion" aria-label="Principal">
+                {% for e in enlaces %}<a href="{% url e.url %}">{{ e.texto }}</a>{% endfor %}
+            </nav>
+
+            <div class="cuenta-opciones">
+                {% if user.is_authenticated %}
+                <span class="saludo">Hola, {{ user.username }}</span>
+                <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>
+                <form method="post" action="{% url 'cuentas:logout' %}" style="display: inline; margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="boton-enlace" style="background:none; border:0; padding:0; font:inherit; cursor:pointer; color:var(--texto-suave);">Salir</button>
+                </form>
+                {% else %}
+                <a href="{% url 'cuentas:login' %}">Iniciar sesión</a>
+                <a class="boton boton-chico" href="{% url 'cuentas:registro' %}">Regístrate</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </header>
