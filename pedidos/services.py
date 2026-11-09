@@ -316,7 +316,7 @@ def mensaje_pedido(pedido):
             }
         
         color = "A coordinar" if d.color == COLOR_A_COORDINAR else (d.color or "Único")
-        productos_agrupados[prod_id]["items"].append(f"   - {d.cantidad} un. ({color})")
+        productos_agrupados[prod_id]["items"].append(f"   - {d.cantidad} unidades ({color})")
         productos_agrupados[prod_id]["subtotal_prod"] += d.subtotal
 
     # Construimos los bloques formales y ordenados

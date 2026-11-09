@@ -215,7 +215,7 @@ class CurvaTests(TestCase):
         self.client.post(reverse("pedidos:confirmar"), DATOS)
         texto = mensaje_pedido(Pedido.objects.get())
         self.assertIn(
-            "*Remera*\n   Talles: 2, 3, 4, 5\n   - 4 un. (Negro)\n   - 1 un. (A coordinar)\n   Subtotal: $5.000,00",
+            "*Remera*\n   Talles: 2, 3, 4, 5\n   - 4 unidades (Negro)\n   - 1 unidades (A coordinar)\n   Subtotal: $5.000,00",
             texto,
         )
 
@@ -228,7 +228,7 @@ class CurvaTests(TestCase):
         self.agregar(sin_variantes, 1)
         self.client.post(reverse("pedidos:confirmar"), DATOS)
         texto = mensaje_pedido(Pedido.objects.get())
-        self.assertIn("*Cinto*\n   - 1 un. (Único)\n   Subtotal: $500,00", texto)
+        self.assertIn("*Cinto*\n   - 1 unidades (Único)\n   Subtotal: $500,00", texto)
         self.assertNotIn("Talles:", texto)
 
     def test_confirmar_revalida_la_curva_si_cambiaron_los_talles(self):
