@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from .forms import PedidoForm
 from .models import Pedido
-from .services import mensaje_pedido, telefono_internacional, url_whatsapp
+from .services import SEPARADOR, mensaje_pedido, telefono_internacional, url_whatsapp
 from .test_cobertura import CLAVE, BaseTests, Estado
 
 NEGOCIO = {
@@ -21,25 +21,34 @@ NEGOCIO = {
 
 @override_settings(NEGOCIO=NEGOCIO)
 class AvisoAlDuenoTests(BaseTests):
-    def test_el_mensaje_incluye_el_detalle_del_pedido(self):
+    def test_el_mensaje_sigue_el_formato_del_ticket(self):
         pedido = self.pedido_con_detalle(cantidad=2)
         texto = mensaje_pedido(pedido)
-        self.assertIn(f"pedido #{pedido.pk} en Mi Negocio", texto)
-        self.assertIn("2 x Cinta ($3000.00)", texto)
-        self.assertIn("Total: $3000.00", texto)
-        self.assertIn("Entrega: Retiro en el local", texto)
-        self.assertIn("Teléfono: 1155551111", texto)
-        self.assertIn("Cliente: ana", texto)
+        self.assertTrue(
+            texto.startswith(f"*PEDIDO # {pedido.pk} - Mi Negocio*\n{SEPARADOR}\n")
+        )
+        self.assertIn("*Cinta*", texto)
+        self.assertIn("   Subtotal: $3.000,00", texto)
+        self.assertIn("*Total del pedido:* *$3.000,00*", texto)
+        self.assertIn("*Modalidad:* Retiro en el local", texto)
+        self.assertIn("*Dirección:* Calle Falsa 123", texto)
+        self.assertIn("*Pago:* A coordinar", texto)
+        self.assertIn("*Cliente:* ana", texto)
+        self.assertIn("*Teléfono:* 1155551111", texto)
 
-    def test_el_mensaje_avisa_que_el_envio_se_coordina_por_el_chat(self):
+    def test_el_envio_se_coordina_por_el_chat(self):
         pedido = self.pedido_con_detalle()
         pedido.entrega = Pedido.Entrega.ENVIO
         pedido.save()
-        self.assertIn("Dirección: a coordinar por este chat", mensaje_pedido(pedido))
+        texto = mensaje_pedido(pedido)
+        self.assertIn("*Modalidad:* Envío", texto)
+        self.assertIn("*Dirección:* A coordinar por este chat", texto)
+        self.assertNotIn("Calle Falsa 123", texto)
 
-    def test_el_mensaje_no_menciona_direccion_si_es_retiro(self):
+    def test_el_texto_del_pago_sale_de_la_configuracion(self):
         pedido = self.pedido_con_detalle()
-        self.assertNotIn("Dirección", mensaje_pedido(pedido))
+        with self.settings(NEGOCIO={**NEGOCIO, "pago": "Solo transferencia"}):
+            self.assertIn("*Pago:* Solo transferencia", mensaje_pedido(pedido))
 
     def test_la_url_de_whatsapp_codifica_el_mensaje(self):
         self.assertEqual(

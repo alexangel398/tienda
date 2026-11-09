@@ -208,14 +208,28 @@ class CurvaTests(TestCase):
         self.assertEqual(detalle.color, "")
         self.assertEqual(detalle.talles, "1, 2, 3")
 
-    def test_el_aviso_de_whatsapp_incluye_color_y_talles(self):
+    def test_el_ticket_de_whatsapp_incluye_color_y_talles(self):
         self.client.force_login(self.usuario)
         self.agregar(self.remera, 4, self.negro)
         self.agregar(self.remera, 1)
         self.client.post(reverse("pedidos:confirmar"), DATOS)
         texto = mensaje_pedido(Pedido.objects.get())
-        self.assertIn("4 x Remera · Negro · talles 2, 3, 4, 5", texto)
-        self.assertIn("1 x Remera · Color a coordinar · talles 2, 3, 4, 5", texto)
+        self.assertIn(
+            "*Remera*\n   Talles: 2, 3, 4, 5\n   - 4 un. (Negro)\n   - 1 un. (A coordinar)\n   Subtotal: $5.000,00",
+            texto,
+        )
+
+    def test_el_ticket_omite_color_y_talles_si_el_modelo_no_los_tiene(self):
+        sin_variantes = Producto.objects.create(
+            nombre="Cinto", precio=Decimal("500"), stock=5,
+            categoria=self.remera.categoria, marca=self.remera.marca,
+        )
+        self.client.force_login(self.usuario)
+        self.agregar(sin_variantes, 1)
+        self.client.post(reverse("pedidos:confirmar"), DATOS)
+        texto = mensaje_pedido(Pedido.objects.get())
+        self.assertIn("*Cinto*\n   - 1 un. (Único)\n   Subtotal: $500,00", texto)
+        self.assertNotIn("Talles:", texto)
 
     def test_confirmar_revalida_la_curva_si_cambiaron_los_talles(self):
         self.client.force_login(self.usuario)

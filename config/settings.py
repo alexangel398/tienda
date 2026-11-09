@@ -141,10 +141,10 @@ NEGOCIO = {
     "ciudad": env("NEGOCIO_CIUDAD", default="La Salada"),
     "direccion": env("NEGOCIO_DIRECCION", default="La Salada, Ocean, Puesto 132, Pasillo 6"),
     "horarios": env("NEGOCIO_HORARIOS", default=""),
-    "whatsapp": env("NEGOCIO_WHATSAPP", default="5491100000000"),
+    "whatsapp": env("NEGOCIO_WHATSAPP", default="5491163633835"),
     "tiktok": env("NEGOCIO_TIKTOK", default="https://www.tiktok.com/@zairux.tu.moda"),
     "facebook": env("NEGOCIO_FACEBOOK", default="https://www.facebook.com/Zairux.tu.moda"),
-    "instagram": env("NEGOCIO_INSTAGRAM", default=""),
+    "pago": env("NEGOCIO_PAGO", default="Transferencia / Efectivo (a coordinar)"),
 }
 
 STATIC_ROOT = BASE_DIR / "staticfiles"

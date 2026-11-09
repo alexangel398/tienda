@@ -9,9 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
             botonMenu.setAttribute("aria-expanded", String(abierto));
         });
     }
-
-// Colores: muestra los elegidos, ajusta el mínimo y reduce la cantidad al destildar si es mayor al mínimo.
-    const ajustarColores = (grupo) => {
+// Escuchar cambios en los checkboxes de colores
+    document.addEventListener("change", (e) => {
+        if (e.target.matches('input[name="colores"]')) {
+            const grupo = e.target.closest("[data-colores]");
+            if (grupo) ajustarColores(grupo);
+        }
+    });
+const ajustarColores = (grupo) => {
         const elegidos = [...grupo.querySelectorAll("input:checked")];
         const nombres = elegidos.map((c) => c.closest(".bolita").title);
         grupo.querySelector("[data-colores-elegidos]").textContent = nombres.length
@@ -19,21 +24,22 @@ document.addEventListener("DOMContentLoaded", () => {
             : "(opcional)";
         
         const campo = grupo.closest("form").querySelector('input[name="cantidad"]');
-        const minimoModelo = Number(grupo.dataset.minimo);
+        const minimoModelo = Number(grupo.dataset.minimo) || 1;
         const maximo = campo.max ? Number(campo.max) : Infinity;
         
-        // El nuevo mínimo permitido depende de cuántos colores tildes (o el mínimo del modelo)
-        const nuevoMinimo = Math.min(Math.max(minimoModelo, elegidos.length), maximo);
+        // Si hay colores tildados, el mínimo de unidades debería al menos igualar la cantidad de colores elegidos
+        const cantidadColores = elegidos.length;
+        const nuevoMinimo = Math.min(Math.max(minimoModelo, cantidadColores), maximo);
+        
         campo.min = nuevoMinimo;
 
-        // Si la cantidad actual es menor al mínimo requerido, la subimos
+        // Si la cantidad actual es menor al número de colores o al mínimo, la subimos
         if (Number(campo.value) < nuevoMinimo) {
             campo.value = nuevoMinimo;
         } 
-        // Si destildas colores y la cantidad actual quedó más alta que el nuevo mínimo 
-        // (y supera el mínimo base del modelo), la bajamos automáticamente para acompañar.
-        else if (Number(campo.value) > nuevoMinimo && Number(campo.value) > minimoModelo) {
-            campo.value = Math.max(minimoModelo, elegidos.length);
+        // Si destildas colores y la cantidad actual es mayor al nuevo conteo de colores (y supera el mínimo base)
+        else if (cantidadColores > 0 && Number(campo.value) > cantidadColores) {
+            campo.value = Math.max(minimoModelo, cantidadColores);
         }
     };
 
@@ -75,6 +81,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (nuevo !== Number(campo.value)) {
                 campo.value = nuevo;
                 campo.dispatchEvent(new Event("change", { bubbles: true }));
+                
+                // <--- AGREGAR ESTO: Si el input tiene data-autoenviar, enviamos el formulario automáticamente
+                const form = campo.closest("form");
+                if (form && campo.hasAttribute("data-autoenviar")) {
+                    form.submit();
+                }
             }
             return;
         }

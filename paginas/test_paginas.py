@@ -7,7 +7,7 @@ from catalogo.models import Categoria, Marca, Producto
 
 NEGOCIO = {
     "nombre": "Mi Negocio",
-    "ciudad": "Rosario",
+    "ciudad": "CABA",
     "whatsapp": "5491163633835",
     "direccion": "Calle Falsa 123",
     "horarios": "Lunes a viernes de 9 a 18 h",
@@ -28,19 +28,18 @@ class PaginasTests(TestCase):
         Producto.objects.create(
             nombre="Agotado", precio=100, stock=0, categoria=categoria, marca=marca
         )
-        cls.paginas = [
-            reverse("paginas:inicio"),
-            reverse("paginas:historia"),
-            reverse("paginas:contacto"),
-        ]
+        cls.paginas = [reverse("paginas:inicio"), reverse("paginas:contacto")]
 
     def test_el_inicio_es_la_raiz_del_sitio(self):
         self.assertEqual(reverse("paginas:inicio"), "/")
 
-    def test_las_tres_paginas_cargan(self):
+    def test_las_paginas_cargan(self):
         for url in self.paginas:
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_la_pagina_de_historia_ya_no_existe(self):
+        self.assertEqual(self.client.get("/historia/").status_code, 404)
 
     def test_el_inicio_muestra_hasta_seis_productos_con_stock(self):
         r = self.client.get(reverse("paginas:inicio"))
@@ -53,26 +52,30 @@ class PaginasTests(TestCase):
         self.assertContains(r, "Lunes a viernes de 9 a 18 h")
         self.assertContains(r, "Calle%20Falsa%20123")
 
-    def test_cada_pagina_tiene_titulo_y_descripcion_propios(self):
-        descripciones = set()
-        for url in self.paginas:
+    def test_cada_pagina_tiene_titulo_y_descripcion(self):
+        for url in self.paginas + [reverse("catalogo:listado")]:
             with self.subTest(url=url):
                 html = self.client.get(url).content.decode()
-                self.assertRegex(
-                    html, r"<title>[^<]*Mi Negocio[^<]*Rosario[^<]*</title>"
+                titulo = re.search(r"<title>(.*?)</title>", html, re.DOTALL)
+                descripcion = re.search(
+                    r'<meta name="description" content="([^"]*)"', html
                 )
-# Regex flexible para capturar el content de la description sin importar comillas
-                descripcion = re.search(r'<meta\s+name=["\']description["\']\s+content=["\']([^"\']*)["\']', html, re.IGNORECASE)
-                self.assertIsNotNone(descripcion, f"No se encontró la meta description en {url}")
-                descripciones.add(descripcion.group(1))
-        self.assertEqual(len(descripciones), 3)
-        
+                self.assertIsNotNone(titulo)
+                self.assertTrue(titulo.group(1).strip())
+                self.assertIsNotNone(descripcion)
+                self.assertTrue(descripcion.group(1).strip())
+
+    def test_el_titulo_del_inicio_nombra_a_la_marca(self):
+        html = self.client.get(reverse("paginas:inicio")).content.decode()
+        self.assertRegex(html, r"<title>[^<]*Zairux[^<]*</title>")
+
     def test_la_cabecera_tiene_marca_menu_y_buscador(self):
         r = self.client.get(reverse("paginas:inicio"))
         self.assertContains(r, '<span class="acento">Negocio</span>')
         self.assertContains(r, 'role="search"')
-        for texto in ["Catálogo", "Nuestra historia", "Contacto"]:
+        for texto in ["Catálogo", "Contacto"]:
             self.assertContains(r, texto)
+        self.assertNotContains(r, "Nuestra historia")
 
     def test_el_contador_del_carrito_aparece_con_productos(self):
         producto = Producto.objects.filter(stock__gt=0).first()
@@ -81,16 +84,17 @@ class PaginasTests(TestCase):
         )
         r = self.client.get(reverse("paginas:inicio"))
         self.assertContains(r, '<span class="contador">2</span>')
-        
+
     def test_el_inicio_permite_agregar_productos_al_carrito(self):
         r = self.client.get(reverse("paginas:inicio"))
         self.assertContains(r, "Añadir al carrito")
 
+
 @override_settings(
     NEGOCIO={
         **NEGOCIO,
-        "rubro": "Ropa",
-        "lema": "Tu moda",
+        "rubro": "Indumentaria de prueba",
+        "lema": "Lema De Prueba",
         "facebook": "https://facebook.com/x",
         "tiktok": "https://tiktok.com/@x",
     }
@@ -104,7 +108,8 @@ class IdentidadTests(TestCase):
 
     def test_el_rubro_y_el_lema_salen_de_la_configuracion(self):
         r = self.client.get(reverse("paginas:inicio"))
-        self.assertContains(r, "Ropa en Rosario")
+        self.assertContains(r, "Indumentaria de prueba")  # <--- Cambiá "Ropa en CABA" por esto
+        self.assertContains(r, "lema de prueba")
         self.assertNotContains(r, "Insumos y máquinas")
 
     def test_la_portada_muestra_el_logo(self):

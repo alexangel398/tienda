@@ -20,8 +20,7 @@ def inicio(request):
     return render(request, "paginas/inicio.html", {"destacados": destacados})
 
 
-def historia(request):
-    return render(request, "paginas/historia.html")
+
 
 
 def contacto(request):

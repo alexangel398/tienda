@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 from collections import defaultdict
 from decimal import Decimal
@@ -290,18 +291,62 @@ def telefono_internacional(telefono):
 def url_whatsapp(numero, mensaje):
     return f"https://wa.me/{numero}?text={quote(mensaje)}"
 
+SEPARADOR = "─" * 25
+
+
+def formato_pesos(valor):
+    """200000 -> $200.000,00 (formato argentino)."""
+    texto = f"{Decimal(valor):,.2f}"
+    return "$" + texto.replace(",", "X").replace(".", ",").replace("X", ".")
+
 
 def mensaje_pedido(pedido):
-    lineas = [f"Hola, hice el pedido #{pedido.pk} en {settings.NEGOCIO['nombre']}:", ""]
+    negocio = settings.NEGOCIO
+    
+    # Agrupamos los ítems por producto para unificar colores y talles
+    productos_agrupados = {}
     for d in pedido.detalles.select_related("producto"):
-        partes = [f"{d.cantidad} x {d.producto.nombre}"]
-        if d.color:
-            partes.append(d.color)
-        if d.talles:
-            partes.append(f"talles {d.talles}")
-        lineas.append(f"- {' · '.join(partes)} (${d.subtotal:.2f})")
-    lineas += ["", f"Total: ${pedido.total:.2f}", f"Entrega: {pedido.get_entrega_display()}"]
+        prod_id = d.producto.pk
+        if prod_id not in productos_agrupados:
+            productos_agrupados[prod_id] = {
+                "nombre": d.producto.nombre,
+                "talles": d.talles,
+                "items": [],
+                "subtotal_prod": Decimal("0")
+            }
+        
+        color = "A coordinar" if d.color == COLOR_A_COORDINAR else (d.color or "Único")
+        productos_agrupados[prod_id]["items"].append(f"   - {d.cantidad} un. ({color})")
+        productos_agrupados[prod_id]["subtotal_prod"] += d.subtotal
+
+    # Construimos los bloques formales y ordenados
+    bloques = []
+    for p in productos_agrupados.values():
+        lineas = [f"*{p['nombre']}*"]
+        if p['talles']:
+            lineas.append(f"   Talles: {p['talles']}")
+        lineas.extend(p['items'])
+        lineas.append(f"   Subtotal: {formato_pesos(p['subtotal_prod'])}")
+        bloques.append("\n".join(lineas))
+
     if pedido.entrega == Pedido.Entrega.ENVIO:
-        lineas.append("Dirección: a coordinar por este chat")
-    lineas += [f"Teléfono: {pedido.telefono}", f"Cliente: {pedido.cliente.get_username()}"]
-    return "\n".join(lineas)
+        direccion = "A coordinar por este chat"
+    else:
+        direccion = negocio["direccion"]
+
+    return "\n".join([
+        f"*PEDIDO # {pedido.pk} - {negocio['nombre']}*",
+        SEPARADOR,
+        "\n\n".join(bloques),
+        SEPARADOR,
+        f"*Total del pedido:* *{formato_pesos(pedido.total)}*",
+        "",
+        "*DETALLES DE ENTREGA:*",
+        f"   *Modalidad:* {pedido.get_entrega_display()}",
+        f"   *Dirección:* {direccion}",
+        f"   *Pago:* {negocio.get('pago', 'A coordinar')}",
+        "",
+        "*CONTACTO:*",
+        f"   *Cliente:* {pedido.cliente.get_username()}",
+        f"   *Teléfono:* {pedido.telefono}",
+    ])
